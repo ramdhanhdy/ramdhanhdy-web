@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+  --color-neon: #C6FF00;
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-black text-white overflow-x-hidden font-sans;
+  }
+}
+
+/* Hide scrollbar for the 3D container */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
