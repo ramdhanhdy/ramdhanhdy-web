@@ -1,12 +1,26 @@
 import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 
-export default function TransitionLink({ to, children, className, onClick }) {
+export default function TransitionLink({ to, children, className, onClick, target, rel, ...props }) {
   const navigate = useNavigate();
 
   const handleTransition = (e) => {
-    e.preventDefault();
     if (onClick) onClick(e);
+
+    // Preserve default browser behavior for modified and non-primary clicks.
+    if (
+      e.defaultPrevented ||
+      e.button !== 0 ||
+      e.metaKey ||
+      e.altKey ||
+      e.ctrlKey ||
+      e.shiftKey ||
+      target === '_blank'
+    ) {
+      return;
+    }
+
+    e.preventDefault();
 
     // Get the curtain element
     const curtain = document.getElementById('global-curtain');
@@ -14,6 +28,8 @@ export default function TransitionLink({ to, children, className, onClick }) {
       navigate(to);
       return;
     }
+
+    gsap.killTweensOf(curtain);
 
     // Animate curtain up from bottom
     gsap.fromTo(
@@ -40,7 +56,7 @@ export default function TransitionLink({ to, children, className, onClick }) {
   };
 
   return (
-    <a href={to} onClick={handleTransition} className={className}>
+    <a href={to} onClick={handleTransition} className={className} target={target} rel={rel} {...props}>
       {children}
     </a>
   );

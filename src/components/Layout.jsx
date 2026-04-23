@@ -1,34 +1,48 @@
+import { useLayoutEffect, useRef } from 'react';
 import { Outlet } from 'react-router-dom';
+import gsap from 'gsap';
 import TransitionLink from './TransitionLink';
+import HeaderHomeButton from './HeaderHomeButton';
 
 export default function Layout() {
+  const curtainRef = useRef(null);
+
+  useLayoutEffect(() => {
+    gsap.set(curtainRef.current, { yPercent: 100 });
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col relative w-full font-sans antialiased text-white bg-black">
       {/* Global Header */}
-      <header className="fixed top-0 left-0 w-full z-40 px-8 py-6 flex items-center justify-between pointer-events-none mix-blend-difference">
-        <div className="flex gap-4 pointer-events-auto">
+      <header className="fixed top-0 left-0 w-full z-40 px-8 py-4 flex items-center justify-between pointer-events-none mix-blend-difference">
+        <div className="flex gap-4 pointer-events-auto items-center relative z-10">
+          <HeaderHomeButton />
           <TransitionLink 
-            to="/" 
-            className="px-4 py-2 rounded-full border border-zinc-800 text-sm hover:bg-white hover:text-black transition-colors duration-300"
+            to="/?view=index" 
+            className="px-4 py-2 rounded-full border border-zinc-800 text-sm hover:bg-neon hover:text-black transition-colors duration-300"
           >
             Work
           </TransitionLink>
-          <TransitionLink 
-            to="/about" 
-            className="px-4 py-2 rounded-full border border-zinc-800 text-sm hover:bg-white hover:text-black transition-colors duration-300"
-          >
-            About
-          </TransitionLink>
+            <TransitionLink 
+              to="/about" 
+              className="px-4 py-2 rounded-full border border-zinc-800 text-sm hover:bg-neon hover:text-black transition-colors duration-300"
+            >
+              About
+            </TransitionLink>
+            <TransitionLink 
+              to="/blog" 
+              className="px-4 py-2 rounded-full border border-zinc-800 text-sm hover:bg-neon hover:text-black transition-colors duration-300"
+            >
+              Blog
+            </TransitionLink>
         </div>
-
-        <div className="pointer-events-auto font-medium text-lg tracking-widest uppercase text-white/90">
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-auto font-medium text-lg tracking-widest uppercase text-white/90 whitespace-nowrap">
           Ramdhan Hidayat
         </div>
-
-        <div className="flex gap-4 pointer-events-auto">
+        <div className="flex gap-4 pointer-events-auto relative z-10">
           <TransitionLink 
             to="/contact" 
-            className="px-4 py-2 rounded-full border border-zinc-800 text-sm hover:bg-white hover:text-black transition-colors duration-300"
+            className="px-4 py-2 rounded-full border border-zinc-800 text-sm hover:bg-neon hover:text-black transition-colors duration-300"
           >
             Contact
           </TransitionLink>
@@ -42,9 +56,9 @@ export default function Layout() {
 
       {/* Global Transition Curtain */}
       <div 
+        ref={curtainRef}
         id="global-curtain"
         className="fixed inset-0 z-50 bg-neon pointer-events-none"
-        style={{ transform: 'translateY(100%)' }} // Initial state hidden at bottom
       />
     </div>
   );

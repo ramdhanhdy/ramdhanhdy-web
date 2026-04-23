@@ -42,7 +42,7 @@ export default function IndexList() {
     gsap.to(imageRef.current, {
       opacity: 1,
       scale: 1,
-      rotation: Math.random() * 10 - 5, // Slight random tilt
+      rotation: 0,
       duration: 0.4,
       ease: "power2.out"
     });
@@ -52,41 +52,59 @@ export default function IndexList() {
     gsap.to(imageRef.current, {
       opacity: 0,
       scale: 0.8,
+      rotation: 0,
       duration: 0.3,
       ease: "power2.in"
     });
   };
 
   return (
-    <div ref={containerRef} className="w-full h-full flex items-center justify-center pt-24 pb-12 px-8 overflow-y-auto no-scrollbar">
-      <div className="w-full max-w-5xl flex flex-col gap-2">
+    <div 
+      ref={containerRef} 
+      className="w-full h-full flex items-start justify-center pt-32 pb-24 px-8 overflow-y-auto no-scrollbar"
+      style={{
+        maskImage: 'linear-gradient(to bottom, transparent 0%, black 120px)',
+        WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 120px)'
+      }}
+    >
+      <div className="w-full max-w-5xl flex flex-col gap-2 group/list">
         
         {/* Table Header */}
-        <div className="grid grid-cols-12 gap-4 pb-4 border-b border-zinc-800 text-xs uppercase tracking-widest text-zinc-500 mb-4 list-item">
-          <div className="col-span-1">ID</div>
-          <div className="col-span-6">Title</div>
-          <div className="col-span-4">Category</div>
-          <div className="col-span-1 text-right">Year</div>
+        <div className="grid grid-cols-12 gap-4 pb-4 px-4 border-b border-zinc-800 text-xs uppercase tracking-widest text-zinc-500 mb-4 list-item">
+          <div className="col-span-1 sm:col-span-1">ID</div>
+          <div className="col-span-9 sm:col-span-10">Project</div>
+          <div className="col-span-2 sm:col-span-1 text-right">Year</div>
         </div>
 
         {/* List Items */}
         {projects.map((project) => (
           <div
             key={project.id}
-            className="list-item group grid grid-cols-12 gap-4 py-6 border-b border-zinc-800/50 hover:border-neon items-center cursor-pointer transition-colors duration-300"
+            className="list-item group grid grid-cols-12 gap-4 py-8 px-4 rounded-xl border-b border-zinc-800/50 hover:border-transparent hover:bg-neon items-start cursor-pointer transition-colors duration-300 group-hover/list:opacity-30 hover:!opacity-100"
             onMouseEnter={() => handleMouseEnter(project.image)}
             onMouseLeave={handleMouseLeave}
           >
-            <div className="col-span-1 text-zinc-600 group-hover:text-neon transition-colors font-mono text-sm">
+            <div className="col-span-1 sm:col-span-1 text-zinc-600 group-hover:text-zinc-900 transition-colors font-mono text-sm pt-5">
               0{project.id}
             </div>
-            <div className="col-span-6 text-4xl sm:text-5xl lg:text-7xl font-medium tracking-tight text-zinc-400 group-hover:text-white transition-colors duration-300">
-              {project.title}
+            <div className="col-span-9 sm:col-span-10 flex flex-col gap-3 sm:gap-5">
+              <div className="text-4xl sm:text-5xl lg:text-7xl font-medium tracking-tight leading-[1.1] text-zinc-400 group-hover:text-zinc-900 transition-colors duration-300">
+                {project.title}
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 mt-1">
+                <div className="text-sm text-zinc-500 group-hover:text-zinc-800 transition-colors uppercase tracking-widest flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-neon group-hover:bg-zinc-800 transition-colors"></div>
+                  {project.category}
+                </div>
+                {project.role && (
+                  <div className="text-sm text-zinc-500 group-hover:text-zinc-800 transition-colors uppercase tracking-widest flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-zinc-700 group-hover:bg-zinc-800/50 transition-colors"></div>
+                    {project.role}
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="col-span-4 text-sm text-zinc-500 group-hover:text-zinc-300 transition-colors">
-              {project.category}
-            </div>
-            <div className="col-span-1 text-right text-sm text-zinc-500 group-hover:text-zinc-300 transition-colors">
+            <div className="col-span-2 sm:col-span-1 text-right text-sm text-zinc-500 group-hover:text-zinc-900 transition-colors pt-5">
               {project.year}
             </div>
           </div>
@@ -99,9 +117,9 @@ export default function IndexList() {
         className="fixed top-0 left-0 w-[300px] h-[200px] pointer-events-none z-50 opacity-0 scale-75 shadow-2xl rounded-sm overflow-hidden bg-zinc-900 border border-zinc-800"
       >
         {activeImage ? (
-          <div className="w-full h-full flex items-center justify-center text-zinc-600 font-mono text-sm relative">
-             <div className="absolute inset-0 bg-neon mix-blend-overlay opacity-20"></div>
-             {activeImage}
+          <div className="w-full h-full relative">
+            <img src={activeImage} alt="Project Preview" className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-neon mix-blend-overlay opacity-20 pointer-events-none"></div>
           </div>
         ) : null}
       </div>
