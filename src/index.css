@@ -19,3 +19,8 @@
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+/* Fix for stuck hover states during smooth scrolling */
+.disable-hover .list-item {
+  pointer-events: none !important;
+}

@@ -1,11 +1,20 @@
 import { useLayoutEffect, useRef } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import gsap from 'gsap';
 import TransitionLink from './TransitionLink';
 import HeaderHomeButton from './HeaderHomeButton';
 
 export default function Layout() {
   const curtainRef = useRef(null);
+  const location = useLocation();
+
+  // Helper to determine if a link is active
+  const isActive = (path) => {
+    if (path === '/' || path === '/?view=index') {
+      return location.pathname === '/';
+    }
+    return location.pathname.startsWith(path);
+  };
 
   useLayoutEffect(() => {
     gsap.set(curtainRef.current, { yPercent: 100 });
@@ -19,19 +28,31 @@ export default function Layout() {
           <HeaderHomeButton />
           <TransitionLink 
             to="/?view=index" 
-            className="px-4 py-2 rounded-full border border-zinc-800 text-sm hover:bg-neon hover:text-black transition-colors duration-300"
+            className={`px-4 py-2 rounded-full border text-sm transition-colors duration-300 ${
+              isActive('/') 
+                ? 'border-white text-white bg-white/5' 
+                : 'border-zinc-800 text-white hover:bg-neon hover:text-black hover:border-neon'
+            }`}
           >
             Work
           </TransitionLink>
             <TransitionLink 
               to="/about" 
-              className="px-4 py-2 rounded-full border border-zinc-800 text-sm hover:bg-neon hover:text-black transition-colors duration-300"
+              className={`px-4 py-2 rounded-full border text-sm transition-colors duration-300 ${
+                isActive('/about') 
+                  ? 'border-white text-white bg-white/5' 
+                  : 'border-zinc-800 text-white hover:bg-neon hover:text-black hover:border-neon'
+              }`}
             >
               About
             </TransitionLink>
             <TransitionLink 
               to="/blog" 
-              className="px-4 py-2 rounded-full border border-zinc-800 text-sm hover:bg-neon hover:text-black transition-colors duration-300"
+              className={`px-4 py-2 rounded-full border text-sm transition-colors duration-300 ${
+                isActive('/blog') 
+                  ? 'border-white text-white bg-white/5' 
+                  : 'border-zinc-800 text-white hover:bg-neon hover:text-black hover:border-neon'
+              }`}
             >
               Blog
             </TransitionLink>
@@ -42,7 +63,11 @@ export default function Layout() {
         <div className="flex gap-4 pointer-events-auto relative z-10">
           <TransitionLink 
             to="/contact" 
-            className="px-4 py-2 rounded-full border border-zinc-800 text-sm hover:bg-neon hover:text-black transition-colors duration-300"
+            className={`px-4 py-2 rounded-full border text-sm transition-colors duration-300 ${
+              isActive('/contact') 
+                ? 'border-white text-white bg-white/5' 
+                : 'border-zinc-800 text-white hover:bg-neon hover:text-black hover:border-neon'
+            }`}
           >
             Contact
           </TransitionLink>

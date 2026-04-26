@@ -18,7 +18,8 @@ export default function IndexList() {
       duration: 0.8,
       stagger: 0.1,
       ease: 'power3.out',
-      delay: 0.2
+      delay: 0.2,
+      clearProps: 'all'
     });
 
     // Create highly performant GSAP setters for mouse tracking
@@ -36,6 +37,28 @@ export default function IndexList() {
       window.removeEventListener('mousemove', handleMouseMove);
     };
   }, { scope: containerRef });
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    let isScrolling;
+    const handleScroll = () => {
+      document.body.classList.add('disable-hover');
+      
+      window.clearTimeout(isScrolling);
+      isScrolling = setTimeout(() => {
+        document.body.classList.remove('disable-hover');
+      }, 100);
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+      window.clearTimeout(isScrolling);
+      document.body.classList.remove('disable-hover');
+    };
+  }, []);
 
   const handleMouseEnter = (imgSrc) => {
     setActiveImage(imgSrc);
