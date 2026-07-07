@@ -41,6 +41,20 @@ export default function About() {
 
   useGSAP(
     () => {
+      const scroller = scrollerRef.current;
+      const text = textRef.current;
+
+      // Position of text top relative to scroller viewport at scroll 0
+      const initialTop =
+        text.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
+
+      // Target: ~15% of characters lit at scroll 0.
+      // Based on reading research: visual span ~10 chars/fixation, optimal line
+      // length 50-75 CPL (sweet spot ~66), reading speed ~238 wpm non-fiction.
+      // 15% of ~920 total chars ≈ 138 chars ≈ 2 lines — enough head start so the
+      // lit text stays ahead of the reader's current position.
+      const INITIAL_LIT_RATIO = 0.15;
+
       // Character reveal scrub animation
       gsap.to(".text-char", {
         color: "#ffffff",
@@ -48,10 +62,20 @@ export default function About() {
         duration: 2,
         stagger: 0.05,
         scrollTrigger: {
-          trigger: textRef.current,
-          scroller: scrollerRef.current,
-          start: "top 85%", // Pre-lights the first paragraphs beautifully
-          end: "bottom 60%", // Finishes lighting up as the bottom comes smoothly into view
+          trigger: text,
+          scroller: scroller,
+          start: () => {
+            const vh = scroller.offsetHeight;
+            const textHeight = text.offsetHeight;
+            const endPos = 0.95 * vh;
+            const r = INITIAL_LIT_RATIO;
+            // Solve for startPos so that progress at scroll 0 equals r:
+            // (startPos - initialTop) / (textHeight - endPos + startPos) = r
+            const startPos =
+              (initialTop + r * textHeight - r * endPos) / (1 - r);
+            return `top ${startPos}px`;
+          },
+          end: () => `bottom ${0.95 * scroller.offsetHeight}px`,
           scrub: 1,
         },
       });
@@ -93,7 +117,7 @@ export default function About() {
         */}
         <div
           ref={contentRef}
-          className="max-w-4xl mx-auto w-full px-6 md:px-12 flex flex-col pt-32 pb-40"
+          className="max-w-4xl mx-auto w-full px-6 md:px-12 flex flex-col pt-32 pb-24"
         >
           <div
             ref={textRef}
