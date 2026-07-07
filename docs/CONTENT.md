@@ -71,7 +71,7 @@ category: AI Health Agent       # required — short category label
 role: Research & Development    # required — your role
 year: "2026"                    # required — string, quoted
 order: 1                        # required — carousel/index position (ascending)
-cover: /placeholder-lumen.jpg   # required — path in public/
+cover: /placeholder-lumen.jpg   # optional — path in public/. Omit for text-only cards.
 summary: >-                     # required — one-sentence outcome
   An AI health agent that turns fragmented personal health data into
   actionable daily guidance.
@@ -86,9 +86,10 @@ draft: false                    # optional — true hides it everywhere
   (`/work/:slug`). Use kebab-case. The filename should match the slug.
 - **`order`** is an integer. Lower = earlier in the carousel and index list.
   Gaps are fine (1, 2, 3, 5, 8) — they're just sort keys.
-- **`cover`** is a path relative to `public/`. The loader maps it to `image`
-  for compatibility with the Overview3D and IndexList components. Place the
-  actual image file in `public/`.
+- **`cover`** is optional. If present, it is a path relative to `public/` (leading
+  slash). The loader maps it to `image` for the card components. If absent,
+  the project renders as a text-only card (no image) in the carousel and index.
+  Place image files in `public/`.
 - **`year`** must be a quoted string (`"2026"`, not `2026`). YAML parses
   unquoted numbers, which can cause type coercion issues.
 - **`stack`** is optional but recommended. Rendered as a comma-separated list

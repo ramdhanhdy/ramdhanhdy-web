@@ -1,0 +1,56 @@
+---
+title: GLMsBench
+slug: glmsbench
+category: Provider Benchmarking
+role: Data Engineering
+year: "2026"
+order: 6
+summary: A benchmark harness comparing the same LLM across two inference providers — measuring latency, output parity, cost, and rate-limit behavior.
+stack: [Python, asyncio, httpx, pytest]
+---
+
+## Context
+
+Two providers serve the same underlying model (GLM-5.2) through different
+infrastructure, pricing, and rate limits. From a user's perspective, are they
+actually equivalent? A model is only as good as the infrastructure serving it,
+and "same model" doesn't guarantee same output, same speed, or same cost.
+
+## Approach
+
+The harness measures four dimensions that matter to real users:
+
+1. **Latency** — TTFT, inter-token, and end-to-end, reported as p50/p95. Two
+   populations are tracked: clean (no throttling) for apples-to-apples
+   inference speed, and effective (including backoff) for real-world experience
+   under load.
+
+2. **Parity** — Cross-provider answer disagreement at temperature=0. The
+   headline number for "do these providers produce the same output?" If
+   parity drops, one of them is silently modifying the model (quantization,
+   system prompt injection, or different model version).
+
+3. **Cost** — Supports both metered (per-token) and subscription (flat-fee)
+   pricing models. Subscription plans are translated into an effective
+   $/1M-token range using configurable usage-intensity tiers.
+
+4. **Rate limits** — 429s, backoff time, and retry counts per provider,
+   treated as a first-class signal rather than noise. A provider that
+   throttles aggressively may be cheaper per token but more expensive per
+   successful request.
+
+## Evidence
+
+- Standard evaluation suites: MMLU, GSM8K, ARC-Challenge, HumanEval
+- p50/p95 latency reporting with clean vs effective populations
+- Cross-provider parity measurement at temperature=0
+- Cost modeling for both metered and subscription pricing
+- Rate-limit behavior tracked as first-class signal (429s, backoff, retries)
+- JSON + Markdown report output
+
+## Outcome
+
+GLMsBench answers a question that providers don't want you to ask: when two
+services claim to serve the same model, which one actually delivers? The answer
+is rarely "they're identical" — and the differences show up in latency, output
+parity, and reliability long before they show up in the price.

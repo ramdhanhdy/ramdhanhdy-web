@@ -11,7 +11,7 @@ export default function IndexList() {
   const navigate = useNavigate();
   const containerRef = useRef(null);
   const imageRef = useRef(null);
-  const [activeImage, setActiveImage] = useState(null);
+  const [activeProject, setActiveProject] = useState(null);
 
   useGSAP(() => {
     // Entrance animation for list items
@@ -63,8 +63,8 @@ export default function IndexList() {
     };
   }, []);
 
-  const handleMouseEnter = (imgSrc) => {
-    setActiveImage(imgSrc);
+  const handleMouseEnter = (project) => {
+    setActiveProject(project);
     gsap.to(imageRef.current, {
       opacity: 1,
       scale: 1,
@@ -116,7 +116,7 @@ export default function IndexList() {
             href={`/work/${project.slug}`}
             className="list-item group grid grid-cols-12 gap-4 py-8 px-4 rounded-xl border-b border-zinc-800/50 hover:border-transparent hover:bg-neon items-start cursor-pointer transition-colors duration-300 group-hover/list:opacity-30 hover:!opacity-100"
             onClick={(e) => handleRowClick(e, project.slug)}
-            onMouseEnter={() => handleMouseEnter(project.image)}
+            onMouseEnter={() => handleMouseEnter(project)}
             onMouseLeave={handleMouseLeave}
           >
             <div className="col-span-1 sm:col-span-1 text-zinc-600 group-hover:text-zinc-900 transition-colors font-mono text-sm pt-5">
@@ -146,15 +146,35 @@ export default function IndexList() {
         ))}
       </div>
 
-      {/* Floating Image Preview */}
+      {/* Floating Preview — image or text card depending on project */}
       <div 
         ref={imageRef}
         className="fixed top-0 left-0 w-[300px] h-[200px] pointer-events-none z-50 opacity-0 scale-75 shadow-2xl rounded-sm overflow-hidden bg-zinc-900 border border-zinc-800"
       >
-        {activeImage ? (
+        {activeProject?.image ? (
           <div className="w-full h-full relative">
-            <img src={activeImage} alt="Project Preview" className="w-full h-full object-cover" decoding="async" />
+            <img src={activeProject.image} alt={activeProject.title} className="w-full h-full object-cover" decoding="async" />
             <div className="absolute inset-0 bg-neon mix-blend-overlay opacity-20 pointer-events-none"></div>
+          </div>
+        ) : activeProject ? (
+          <div className="w-full h-full flex flex-col items-center justify-center gap-2 p-4 bg-zinc-950 relative">
+            <div
+              className="absolute inset-0 opacity-[0.04]"
+              style={{
+                backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)',
+                backgroundSize: '18px 18px',
+              }}
+            />
+            <div className="relative z-10 w-1.5 h-1.5 rotate-45 bg-neon mb-1" />
+            <div className="relative z-10 text-lg font-semibold tracking-tight text-white text-center leading-tight">
+              {activeProject.title}
+            </div>
+            <div className="relative z-10 font-mono text-[9px] uppercase tracking-[0.2em] text-neon/80">
+              {activeProject.category}
+            </div>
+            <div className="relative z-10 font-mono text-[9px] uppercase tracking-widest text-zinc-500">
+              {activeProject.role}
+            </div>
           </div>
         ) : null}
       </div>

@@ -30,7 +30,11 @@ function collect(metaGlob, bodyGlob) {
 export const projects = collect(projectMeta, projectBodies)
   .filter((p) => !p.draft)
   .sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
-  .map((p, i) => ({ ...p, id: i + 1, image: p.cover }));
+  .map((p, i) => ({
+    ...p,
+    id: i + 1,
+    ...(p.cover ? { image: p.cover } : {}),
+  }));
 
 export const posts = collect(postMeta, postBodies)
   .filter((p) => !p.draft)

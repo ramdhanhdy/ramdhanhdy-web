@@ -1,0 +1,51 @@
+---
+title: LLM Text Network Analysis
+slug: llm-text-network-analysis
+category: Model Fingerprinting
+role: Data Science
+year: "2026"
+order: 4
+cover: /placeholder-llm-network.jpg
+summary: Identify stealth and anonymous LLMs by comparing their writing style against 49 known models using TF-IDF cosine similarity and network clustering.
+stack: [Python, scikit-learn, UMAP, Leiden, OpenRouter]
+---
+
+## Context
+
+New LLM providers increasingly serve "anonymous" or "stealth" models — you
+don't know what's behind the API. Is it a GPT variant? A Llama fine-tune?
+Something entirely new? Without knowing the model family, you can't predict
+its strengths, weaknesses, or cost-efficiency for a given task.
+
+## Approach
+
+The system works in two stages:
+
+1. **Collect** — Send 96 standardized prompts to a model via OpenRouter.
+   Responses are auto-merged into a canonical dataset that accumulates over
+   time, starting from a baseline of 49 known models (~4,600 responses).
+
+2. **Network** — Compute TF-IDF vectors per model from their responses, then
+   cosine similarity between all pairs. Visualize as a UMAP-laid-out network
+   graph with Leiden community detection. Models that write similarly cluster
+   together, revealing what family a stealth model belongs to.
+
+The key insight: writing style is a fingerprint. Two models from the same family
+will produce structurally similar text even if their answers differ.
+
+## Evidence
+
+- 49 known models in the baseline (~4,600 responses)
+- 96 standardized prompts covering reasoning, creative, factual, and
+  opinion-based tasks
+- UMAP dimensionality reduction for 2D network visualization
+- Leiden community detection for automatic model clustering
+- Incremental dataset: each new model is collected and merged without
+  re-running existing models
+
+## Outcome
+
+A stealth model's position in the network reveals its lineage. If it clusters
+tightly with GPT-4o variants, it's almost certainly a GPT-4o derivative. If it
+sits between two families, it may be a merged or fine-tuned model. The network
+chart is the deliverable — a visual fingerprint of the LLM landscape.

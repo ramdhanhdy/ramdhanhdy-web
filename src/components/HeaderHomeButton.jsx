@@ -10,11 +10,23 @@ export default function HeaderHomeButton() {
         aria-label="Home"
       >
         <svg
-          viewBox="0 0 100 100"
-          className="w-7 h-7 fill-white group-hover:fill-neon transition-colors duration-300"
+          viewBox="0 0 200 200"
+          className="w-7 h-7 stroke-white group-hover:stroke-neon transition-colors duration-300"
         >
-          {/* Elegant 4-pointed star characteristic of premium Awwwards sites */}
-          <path d="M50,0 C50,25 25,50 0,50 C25,50 50,75 50,100 C50,75 75,50 100,50 C75,50 50,25 50,0 Z" />
+          {/* Hexagon frame + geometric r — personal mark */}
+          <path
+            d="M100,12 L176,56 L176,144 L100,188 L24,144 L24,56 Z"
+            fill="none"
+            strokeWidth="5"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M74,141 L74,80 Q74,56 97,56 Q121,56 121,81 Q121,105 97,105 L74,105 L121,141"
+            fill="none"
+            strokeWidth="14"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         </svg>
       </TransitionLink>
     </div>

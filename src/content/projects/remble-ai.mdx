@@ -1,0 +1,52 @@
+---
+title: RSemble AI
+slug: remble-ai
+category: Multi-Model Orchestration
+role: Fullstack Engineering
+year: "2026"
+order: 2
+cover: /placeholder-remble.jpg
+summary: Run several AI models on the same task at once, then rank which is best or fuse them into a single answer. One pipeline, two finish modes.
+stack: [TypeScript, React, OpenRouter, Tailwind CSS]
+---
+
+## Context
+
+When multiple LLMs can answer the same question, choosing the right one is
+guesswork. You either trust a single model blindly, or you manually paste the
+prompt into several and compare. There's no structured way to say what "good"
+means, score candidates against it, and either pick a winner or merge the
+strongest material.
+
+## Approach
+
+RSemble runs a single pipeline with two finish modes:
+
+1. **Rank** — Several models generate answers in parallel. A judge model
+   scores each candidate against a user-defined rubric, surfacing consensus,
+   contradictions, and unique insights. The result is a leaderboard with
+   tier-colored scores and a recommendation.
+2. **Fuse** — The judge synthesizes one merged answer from the strongest
+   material across all candidates, with each source expandable to see what it
+   contributed.
+
+The rubric is the key abstraction: it defines what "good" means for a specific
+task, and the judge scores against it rather than giving a generic quality
+rating.
+
+## Evidence
+
+- Live pipeline: watch each model stream token-by-token through Generating,
+  Judging, and Fusing stages
+- Responsive workspace: two-pane on desktop, stacked on tablet, output-first
+  with command drawer on mobile
+- Keyboard-navigable, focus-visible throughout, reduced-motion aware
+- Live model catalog from OpenRouter, with manual slug entry for brand-new
+  models
+
+## Outcome
+
+RSemble turns model selection from a guess into a structured decision. The rank
+mode answers "which model should I use for this?" and the fuse mode answers
+"can I get a better answer by combining them?" — both backed by a rubric the
+user controls.

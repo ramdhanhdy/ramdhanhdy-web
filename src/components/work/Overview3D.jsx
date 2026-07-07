@@ -228,31 +228,72 @@ export default function Overview3D() {
               className="relative w-full h-full rounded-xl overflow-hidden border border-white/[0.08] shadow-2xl"
               style={{ transform: 'translateZ(0)' /* Mitigate Chrome/Safari border-radius rendering bugs */ }}
             >
-              {/* Depth overlay — gets darker for deeper cards */}
-              <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors duration-500 z-10" />
+              {project.image ? (
+                <>
+                  {/* Depth overlay — gets darker for deeper cards */}
+                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors duration-500 z-10" />
 
-              {/* Project image */}
-              <img
-                src={project.image}
-                alt={project.title}
-                className="object-cover w-full h-full"
-                loading="eager"
-                decoding="async"
-                width={CARD_W}
-                height={CARD_H}
-              />
+                  {/* Project image */}
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    className="object-cover w-full h-full"
+                    loading="eager"
+                    decoding="async"
+                    width={CARD_W}
+                    height={CARD_H}
+                  />
 
-              {/* Bottom-left text overlay */}
-              <div className="absolute bottom-5 left-6 z-20 flex flex-col gap-1">
-                <h2 className="text-xl font-semibold text-white drop-shadow-lg">
-                  {project.title}
-                </h2>
-              </div>
+                  {/* Bottom-left text overlay */}
+                  <div className="absolute bottom-5 left-6 z-20 flex flex-col gap-1">
+                    <h2 className="text-xl font-semibold text-white drop-shadow-lg">
+                      {project.title}
+                    </h2>
+                  </div>
 
-              {/* Year badge */}
-              <div className="absolute bottom-5 right-6 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                <span className="text-xs text-zinc-400 font-mono">{project.year}</span>
-              </div>
+                  {/* Year badge */}
+                  <div className="absolute bottom-5 right-6 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                    <span className="text-xs text-zinc-400 font-mono">{project.year}</span>
+                  </div>
+                </>
+              ) : (
+                /* Text-only card — typography is the hero, no image */
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-10 bg-zinc-950">
+                  {/* Subtle dot-grid texture */}
+                  <div
+                    className="absolute inset-0 opacity-[0.04]"
+                    style={{
+                      backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)',
+                      backgroundSize: '24px 24px',
+                    }}
+                  />
+                  {/* Depth overlay for consistency with image cards */}
+                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors duration-500 z-10" />
+
+                  {/* Neon diamond mark */}
+                  <div className="relative z-20 w-2 h-2 rotate-45 bg-neon mb-2" />
+
+                  {/* Project title — the hero */}
+                  <h2 className="relative z-20 text-3xl md:text-4xl font-semibold tracking-tight text-white text-center leading-tight">
+                    {project.title}
+                  </h2>
+
+                  {/* Category + role in mono */}
+                  <div className="relative z-20 flex flex-col items-center gap-1">
+                    <span className="font-mono text-xs uppercase tracking-[0.2em] text-neon/80">
+                      {project.category}
+                    </span>
+                    <span className="font-mono text-xs uppercase tracking-widest text-zinc-500">
+                      {project.role}
+                    </span>
+                  </div>
+
+                  {/* Year badge */}
+                  <div className="absolute bottom-5 right-6 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                    <span className="text-xs text-zinc-400 font-mono">{project.year}</span>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Floating callout — angular leader line + compact metadata tag.

@@ -1,0 +1,49 @@
+---
+title: SycoBench
+slug: scobench
+category: AI Evaluation
+role: Research & Development
+year: "2025"
+order: 3
+cover: /placeholder-scobench.jpg
+summary: An evaluation dashboard for analyzing and visualizing AI model sycophancy patterns across diverse prompt scenarios.
+stack: [TypeScript, Next.js, React, Tailwind CSS]
+---
+
+## Context
+
+LLMs tend to agree with the user even when the user is wrong. This sycophancy
+bias is well-documented but hard to measure systematically. Researchers and
+practitioners need a way to see which models are sycophantic, in which
+contexts, and by how much — without manually reading hundreds of responses.
+
+## Approach
+
+SycoBench sends standardized prompts that contain intentional errors or
+opinions, then measures whether the model corrects, agrees, or hedges. The
+dashboard visualizes results across three dimensions:
+
+1. **Sycophancy Index** — A bar chart with risk-based color coding showing
+   each model's overall sycophancy score.
+2. **Behavioral Quadrant** — A scatter plot mapping sycophancy vs stability,
+   showing which models are consistent vs which flip-flop.
+3. **Elasticity Quadrant** — Advanced analysis of stance responsiveness and
+   topic consistency, measuring how much a model's stance shifts when the
+   prompt's framing changes.
+
+A Prompt Explorer lets you drill into individual prompts and compare models
+side-by-side on the same prompt.
+
+## Evidence
+
+- Interactive sycophancy index chart with risk-based color coding
+- Behavioral and elasticity quadrant scatter plots
+- Per-model metrics table with toggle functionality
+- Side-by-side model comparison on individual prompts
+- Methodology documentation with mathematical foundations
+
+## Outcome
+
+SycoBench makes an invisible bias measurable. A researcher can see at a glance
+which models agree too readily, which contexts trigger sycophancy most, and
+whether a model's stance is stable or elastic to prompt framing.

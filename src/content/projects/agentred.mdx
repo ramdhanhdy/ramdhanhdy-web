@@ -1,0 +1,50 @@
+---
+title: AgentRed
+slug: agentred
+category: Multi-Agent Orchestration
+role: System Design
+year: "2026"
+order: 5
+summary: MapReduce-style parallel AI agents that scrape job postings, extract demand signals, and merge them into a ranked opportunity report.
+stack: [Python, LangGraph, EXA API, OpenRouter]
+---
+
+## Context
+
+Understanding what the market wants to build next requires reading hundreds of
+job postings across multiple platforms. A single analyst reading sequentially
+loses context, misses patterns, and produces a report that's already outdated.
+The bottleneck isn't access to data — it's the ability to process it at scale.
+
+## Approach
+
+AgentRed applies the MapReduce paradigm to market research:
+
+1. **Collect** — Scrape job postings from Upwork, Fiverr, Himalayas, and
+   Jobicy (700+ posts per run).
+2. **Partition** — Split into batches of ~50 posts, shuffled across sources
+   to avoid source bias.
+3. **Map** — Each mapper agent gets an isolated context window and a structured
+   brief. It independently extracts demand signals: skills, tools, pain points,
+   automation potential, and budgets.
+4. **Reduce** — A reducer agent clusters signals across all batches, resolves
+   conflicts, and ranks opportunities by demand score.
+5. **Report** — Markdown, DOCX, and JSON output with ranked opportunities and
+   evidence from the source postings.
+
+The MapReduce split isn't just parallelism — it's context isolation. Each
+mapper sees only its batch, so it can focus on extraction without being biased
+by earlier findings. The reducer's job is to find the signal across all mappers.
+
+## Evidence
+
+- 700+ job postings processed per run across 4 platforms
+- Parallel mapper agents with isolated context windows
+- Structured output: skills, tools, pain points, budgets, automation potential
+- Triple format output: Markdown + DOCX + JSON
+
+## Outcome
+
+AgentRed turns market research from a sequential reading task into a parallel
+extraction pipeline. The ranked opportunity report answers "what should I
+build?" with evidence from real demand signals, not guesswork.
