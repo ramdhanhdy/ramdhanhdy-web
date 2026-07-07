@@ -2,6 +2,7 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Meta from "../components/Meta";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -101,6 +102,10 @@ export default function About() {
       ref={containerRef}
       className="w-full bg-black relative h-screen overflow-hidden"
     >
+      <Meta
+        title="About"
+        description="Data analyst and AI engineer. From retail operations analytics to AI agents, computer vision, and policy briefings."
+      />
       <div
         ref={scrollerRef}
         className="w-full h-full overflow-y-auto no-scrollbar"

@@ -1,11 +1,14 @@
 import { useRef, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
-import { projects } from '../../lib/data';
+import { projects } from '../../lib/content';
+import { curtainTransition } from '../../lib/curtain';
 
 gsap.registerPlugin(useGSAP);
 
 export default function IndexList() {
+  const navigate = useNavigate();
   const containerRef = useRef(null);
   const imageRef = useRef(null);
   const [activeImage, setActiveImage] = useState(null);
@@ -81,6 +84,13 @@ export default function IndexList() {
     });
   };
 
+  const handleRowClick = (e, slug) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    e.preventDefault();
+    handleMouseLeave();
+    curtainTransition(() => navigate(`/work/${slug}`));
+  };
+
   return (
     <div 
       ref={containerRef} 
@@ -101,9 +111,11 @@ export default function IndexList() {
 
         {/* List Items */}
         {projects.map((project) => (
-          <div
+          <a
             key={project.id}
+            href={`/work/${project.slug}`}
             className="list-item group grid grid-cols-12 gap-4 py-8 px-4 rounded-xl border-b border-zinc-800/50 hover:border-transparent hover:bg-neon items-start cursor-pointer transition-colors duration-300 group-hover/list:opacity-30 hover:!opacity-100"
+            onClick={(e) => handleRowClick(e, project.slug)}
             onMouseEnter={() => handleMouseEnter(project.image)}
             onMouseLeave={handleMouseLeave}
           >
@@ -130,7 +142,7 @@ export default function IndexList() {
             <div className="col-span-2 sm:col-span-1 text-right text-sm text-zinc-500 group-hover:text-zinc-900 transition-colors pt-5">
               {project.year}
             </div>
-          </div>
+          </a>
         ))}
       </div>
 
@@ -141,7 +153,7 @@ export default function IndexList() {
       >
         {activeImage ? (
           <div className="w-full h-full relative">
-            <img src={activeImage} alt="Project Preview" className="w-full h-full object-cover" />
+            <img src={activeImage} alt="Project Preview" className="w-full h-full object-cover" decoding="async" />
             <div className="absolute inset-0 bg-neon mix-blend-overlay opacity-20 pointer-events-none"></div>
           </div>
         ) : null}

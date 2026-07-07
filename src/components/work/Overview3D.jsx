@@ -1,7 +1,9 @@
 import { useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
-import { projects } from '../../lib/data';
+import { projects } from '../../lib/content';
+import { curtainTransition } from '../../lib/curtain';
 
 gsap.registerPlugin(useGSAP);
 
@@ -10,6 +12,7 @@ const CARD_W = 580;
 const CARD_H = 380;
 
 export default function Overview3D() {
+  const navigate = useNavigate();
   const containerRef = useRef(null);
   const stackRef = useRef(null);
   const scrollPos = useRef(0);           // virtual scroll accumulator
@@ -133,6 +136,7 @@ export default function Overview3D() {
         {projects.map((project, index) => (
           <div
             key={project.id}
+            onClick={() => curtainTransition(() => navigate(`/work/${project.slug}`))}
             className="tunnel-card absolute rounded-xl overflow-hidden cursor-pointer group border border-white/[0.08] shadow-2xl"
             style={{
               width: `${CARD_W}px`,
@@ -154,6 +158,9 @@ export default function Overview3D() {
               alt={project.title}
               className="object-cover w-full h-full"
               loading="eager"
+              decoding="async"
+              width={CARD_W}
+              height={CARD_H}
             />
 
             {/* Bottom-left text overlay */}
