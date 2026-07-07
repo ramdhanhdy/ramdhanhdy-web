@@ -1,8 +1,13 @@
+/* Self-hosted variable fonts (no external font CDN round-trip) */
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/jetbrains-mono";
+
 @import "tailwindcss";
 
 @theme {
   --color-neon: #C6FF00;
-  --font-sans: "Inter", system-ui, sans-serif;
+  --font-sans: "Inter Variable", "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, "Cascadia Mono", monospace;
 }
 
 @layer base {
@@ -23,4 +28,52 @@
 /* Fix for stuck hover states during smooth scrolling */
 .disable-hover .list-item {
   pointer-events: none !important;
+}
+
+/* ── Case study / post prose (MDX body) ─────────────────── */
+.case-prose {
+  @apply text-zinc-300 text-lg leading-relaxed;
+}
+.case-prose h2 {
+  @apply text-3xl md:text-4xl font-semibold tracking-tight text-white mt-16 mb-6;
+}
+.case-prose h3 {
+  @apply text-xl md:text-2xl font-medium tracking-tight text-white mt-10 mb-4;
+}
+.case-prose p {
+  @apply mb-6;
+}
+.case-prose a {
+  @apply text-neon underline underline-offset-4 decoration-neon/40 hover:decoration-neon transition-colors;
+}
+.case-prose ul,
+.case-prose ol {
+  @apply mb-6 pl-5 flex flex-col gap-2;
+}
+.case-prose ul {
+  @apply list-disc marker:text-neon;
+}
+.case-prose ol {
+  @apply list-decimal marker:text-zinc-500;
+}
+.case-prose blockquote {
+  @apply border-l-2 border-neon pl-6 my-8 text-zinc-400 italic;
+}
+.case-prose code {
+  @apply font-mono text-base text-neon/90 bg-zinc-900 px-1.5 py-0.5 rounded;
+}
+.case-prose pre {
+  @apply bg-zinc-950 border border-zinc-800 rounded-xl p-6 my-8 overflow-x-auto;
+}
+.case-prose pre code {
+  @apply bg-transparent p-0 text-zinc-300;
+}
+.case-prose img {
+  @apply rounded-xl border border-white/[0.08] my-8 w-full;
+}
+.case-prose hr {
+  @apply border-zinc-800 my-12;
+}
+.case-prose strong {
+  @apply text-white font-semibold;
 }

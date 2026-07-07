@@ -1,6 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
 import Overview3D from '../components/work/Overview3D';
 import IndexList from '../components/work/IndexList';
+import Meta from '../components/Meta';
 
 export default function Work() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -17,6 +18,8 @@ export default function Work() {
 
   return (
     <div className="w-full h-screen overflow-hidden flex flex-col relative bg-black">
+      <Meta />
+
       {/* View Toggle */}
       <div className="absolute bottom-8 right-8 z-40 flex gap-2 mix-blend-difference bg-zinc-900/50 p-1 rounded-full backdrop-blur-md">
         <button

@@ -1,8 +1,9 @@
-import { useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useRef, Suspense } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import gsap from 'gsap';
 import TransitionLink from './TransitionLink';
 import HeaderHomeButton from './HeaderHomeButton';
+import Meta from './Meta';
 
 export default function Layout() {
   const curtainRef = useRef(null);
@@ -22,6 +23,8 @@ export default function Layout() {
 
   return (
     <div className="min-h-screen flex flex-col relative w-full font-sans antialiased text-white bg-black">
+      <Meta />
+
       {/* Global Header */}
       <header className="fixed top-0 left-0 w-full z-40 px-8 py-4 flex items-center justify-between pointer-events-none mix-blend-difference">
         <div className="flex gap-4 pointer-events-auto items-center relative z-10">
@@ -76,7 +79,10 @@ export default function Layout() {
 
       {/* Page Content */}
       <main className="flex-1 w-full">
-        <Outlet />
+        {/* Lazy route chunks resolve under the curtain; fallback stays black */}
+        <Suspense fallback={null}>
+          <Outlet />
+        </Suspense>
       </main>
 
       {/* Global Transition Curtain */}

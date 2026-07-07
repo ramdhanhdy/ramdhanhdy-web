@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import gsap from 'gsap';
+import { curtainTransition } from '../lib/curtain';
 
 export default function TransitionLink({ to, children, className, onClick, target, rel, ...props }) {
   const navigate = useNavigate();
@@ -22,37 +22,7 @@ export default function TransitionLink({ to, children, className, onClick, targe
 
     e.preventDefault();
 
-    // Get the curtain element
-    const curtain = document.getElementById('global-curtain');
-    if (!curtain) {
-      navigate(to);
-      return;
-    }
-
-    gsap.killTweensOf(curtain);
-
-    // Animate curtain up from bottom
-    gsap.fromTo(
-      curtain,
-      { yPercent: 100 },
-      {
-        yPercent: 0,
-        duration: 0.6,
-        ease: 'power3.inOut',
-        onComplete: () => {
-          // Change route
-          navigate(to);
-          
-          // Animate curtain up and away
-          gsap.to(curtain, {
-            yPercent: -100,
-            duration: 0.6,
-            ease: 'power3.inOut',
-            delay: 0.1 // Brief pause to allow React to render the new page
-          });
-        }
-      }
-    );
+    curtainTransition(() => navigate(to));
   };
 
   return (

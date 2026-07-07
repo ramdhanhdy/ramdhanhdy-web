@@ -1,6 +1,9 @@
+import Meta from '../components/Meta';
+
 export default function Contact() {
   return (
     <div className="w-full h-screen bg-black flex flex-col items-center justify-center pt-20 px-8">
+      <Meta title="Contact" description="Get in touch with Ramdhan Hidayat." />
       <div className="max-w-2xl w-full flex flex-col gap-12">
         <h1 className="text-6xl md:text-8xl font-semibold tracking-tighter text-white">
           Let's<br/>
