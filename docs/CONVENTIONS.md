@@ -102,7 +102,7 @@ export default function PageName() {
   }, { scope: containerRef });
 
   return (
-    <div ref={containerRef} className="w-full h-screen overflow-hidden bg-black">
+    <div ref={containerRef} className="w-full h-screen h-dvh overflow-hidden bg-black">
       <Meta title="..." description="..." />
       {/* scroll-mask container + content */}
     </div>
@@ -113,7 +113,7 @@ export default function PageName() {
 ### Required for every page
 
 1. **`<Meta />`** — for SEO/head tags.
-2. **`h-screen overflow-hidden`** on the outermost div — pages do not use
+2. **`h-screen h-dvh overflow-hidden`** on the outermost div — pages do not use
    document scroll.
 3. **Scroll-mask pattern** if the page scrolls (see ANIMATIONS.md §2).
 4. **`useGSAP` with `{ scope }`** for any mount-time animation.

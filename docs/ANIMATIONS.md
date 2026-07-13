@@ -73,7 +73,7 @@ beneath it instead of hard-clipping.
 **The pattern (copy it exactly when building a new scrollable page):**
 
 ```jsx
-<div className="w-full h-screen overflow-hidden bg-black">   {/* page frame */}
+<div className="w-full h-screen h-dvh overflow-hidden bg-black">   {/* page frame */}
   <div
     className="w-full h-full overflow-y-auto no-scrollbar pt-32 pb-24 ..."
     style={{
@@ -130,6 +130,14 @@ every `.tunnel-card`.
   `offset < -1.5` (passing the camera). Cards under 0.3 opacity get
   `pointer-events: none` so invisible cards can't swallow hovers/clicks.
 
+On touch screens, the same virtual scroll target is driven by vertical swipes:
+
+- `touchstart` records the current Y position; non-passive `touchmove`
+  prevents native rubber-banding and applies the Y delta at `0.006`.
+- Movement beyond 6px marks the gesture as a swipe. The following synthetic
+  click is ignored so swiping a card never opens it accidentally.
+- A stationary tap still navigates through the curtain normally.
+
 ### 3c. Perspective-shear compensation (the "tilted image" fix)
 
 All cards share base rotation (`rotX 8, rotY -38, rotZ -2`), but CSS
@@ -147,19 +155,26 @@ const compX = Math.atan2(yShift, depth) * DEG;   // added to rotationX
 change the perspective value or the offset multipliers, the compensation
 adjusts automatically (it derives from the same numbers).
 
-### 3d. Disc-throw hover
+### 3d. Card-draw hover
 
-Hovering a card "flings" it toward the viewer. Implementation:
+Hovering a non-front card draws it to the right so the selected project becomes
+easy to inspect without covering its neighbors. The single visible card nearest
+the camera—the card the eye reads as the top of the deck—keeps its position and
+uses a restrained depth/scale response instead. Implementation:
 
 - `hoverAmts` — a ref holding one `{ v: 0 }` object per project.
-- `handleCardEnter`: `gsap.to(amt, { v: 1, duration: 0.55, ease:
-  'back.out(2.4)' })`. The back-ease overshoot past 1 creates the kinetic
-  snap.
-- `handleCardLeave`: `v → 0`, `power3.out`, 0.5s.
-- `layoutCards` folds `hover` into every frame:
-  z `+240px`, y `-18px`, yaw `+26°` toward face-on, pitch `-6°`, spin `+3°`,
-  scale `+4%`, z-index `+1000`.
-- All magnitudes are the `THROW_*` constants at the top of the file — tune
+- `handleCardEnter`: `v → 1`, `power3.out`, 0.45s.
+- `handleCardLeave`: `v → 0`, `power3.out`, 0.4s.
+- The outer `.tunnel-card` keeps the base carousel transform and remains a
+  stable hover target. The inner `.tunnel-card-draw` receives the hover motion,
+  preventing the card from losing hover as its visible face moves.
+- `layoutCards` calculates the wrapped offset and opacity of every card, then
+  designates exactly one `frontIndex`: the smallest-offset card whose opacity
+  remains interactive (`>= 0.3`).
+- Non-front cards move x `+240px`, z `+56px`, y `-10px`, and scale `+1.5%`.
+  The front card keeps x/y unchanged while moving z `+32px` and scaling `+1%`.
+  All cards retain their compensated rotation and gain outer z-index `+1000`.
+- All magnitudes are the `DRAW_*` constants at the top of the file — tune
   there, nowhere else.
 - Both handlers `killTweensOf(amt)` first — required for rapid hover on/off.
 
@@ -168,36 +183,43 @@ Hovering a card "flings" it toward the viewer. Implementation:
 Each card contains a `.callout` block (hidden by default, `pointer-events-none`)
 with:
 
-- `.callout-path` — an SVG polyline `M8 68 L8 42 L34 18 L196 18`
+- `.callout-path` — an SVG polyline `M8 84 L8 50 L40 18 L276 18`
   (vertical rise → 45° fold → horizontal run). It draws in via the
   `pathLength="1"` + `strokeDasharray="1"` + animated `strokeDashoffset 1→0`
   trick (GSAP-animatable without the paid DrawSVG plugin).
 - `.callout-marker` — a diamond (rotated rect) pinned where the line meets the
   card; pops in with `back.out(3)` scale.
-- `.callout-label` — mono, uppercase, neon tag reading `0{id} · {CATEGORY}`,
-  fading in with a 0.18s delay so the line "arrives" first.
+- `.callout-label` — a two-line mono tag with the project title in white and
+  `0{id} · {CATEGORY}` in neon, fading in with a 0.18s delay so the line
+  "arrives" first.
 
-The callout lives **inside the card's 3D plane** on purpose: it tilts with the
-card and straightens as the throw rotates the card toward the viewer.
+The callout lives inside `.tunnel-card-draw` on purpose, so it moves with the
+visible card face while preserving the card's compensated angle.
 
 **Structural requirement:** the card root (`.tunnel-card`) has NO
-`overflow-hidden`; clipping and `rounded-xl` live on the inner "card face"
-div. If you re-add overflow-hidden to the root, the callout gets clipped.
-The inner face keeps `transform: translateZ(0)` (Chrome/Safari border-radius
-rendering fix).
+`overflow-hidden`; `.tunnel-card-draw` is a full-size relative wrapper, and
+clipping plus `rounded-xl` live on the inner "card face" div. If you re-add
+overflow-hidden to either outer wrapper, the callout gets clipped. The inner
+face keeps `transform: translateZ(0)` (Chrome/Safari border-radius rendering
+fix).
 
 ### 3f. Misc invariants
 
 - Container: `perspective: ${PERSPECTIVE}px`, `perspectiveOrigin: '50% 15%'`,
   `cursor-ns-resize`. Stack wrapper: `transformStyle: 'preserve-3d'`.
+- Cards retain the 580×380 design coordinate system, but the rAF loop applies
+  a viewport-derived outer scale below 1100px. Phones fit the card inside a
+  48px gutter; tablet scale interpolates smoothly to desktop.
+- Responsive scale also reduces x/y/z spacing, preserving the deck composition
+  instead of merely shrinking individual cards.
 - Cards: `backfaceVisibility: hidden`, sized by `CARD_W/CARD_H` (580×380).
 - Card click navigates via `curtainTransition` (§1).
 - Images: `loading="eager"` (they're the hero content), `decoding="async"`,
   explicit width/height.
 
 **Verify after touching:** wheel in both directions (infinite, no stutter at
-the wrap seam), hover several cards including partially-faded ones, click
-navigates, no card visibly "pops" transforms.
+the wrap seam), swipe vertically on touch, hover several cards including
+partially-faded ones, click/tap navigates, no card visibly "pops" transforms.
 
 ---
 

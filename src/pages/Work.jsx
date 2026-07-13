@@ -17,14 +17,14 @@ export default function Work() {
   };
 
   return (
-    <div className="w-full h-screen overflow-hidden flex flex-col relative bg-black">
+    <div className="w-full h-screen h-dvh overflow-hidden flex flex-col relative bg-black">
       <Meta />
 
       {/* View Toggle */}
-      <div className="absolute bottom-8 right-8 z-40 flex gap-2 mix-blend-difference bg-zinc-900/50 p-1 rounded-full backdrop-blur-md">
+      <div className="absolute bottom-5 right-4 sm:bottom-8 sm:right-8 z-40 flex gap-1 sm:gap-2 mix-blend-difference bg-zinc-900/50 p-1 rounded-full backdrop-blur-md">
         <button
           onClick={() => handleViewChange('overview')}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+          className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-colors ${
             view === 'overview' ? 'bg-neon text-black' : 'text-zinc-400 hover:text-neon'
           }`}
         >
@@ -32,7 +32,7 @@ export default function Work() {
         </button>
         <button
           onClick={() => handleViewChange('index')}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+          className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-colors ${
             view === 'index' ? 'bg-neon text-black' : 'text-zinc-400 hover:text-neon'
           }`}
         >

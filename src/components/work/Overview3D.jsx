@@ -13,12 +13,21 @@ const CARD_H = 380;
 const PERSPECTIVE = 1600;
 const DEG = 180 / Math.PI;
 
-// Disc-throw hover: how far the card is flung toward the viewer
-const THROW_Z = 240;      // px toward camera
-const THROW_LIFT = 18;    // px upward
-const THROW_YAW = 26;     // deg toward face-on
-const THROW_PITCH = 6;    // deg toward face-on
-const THROW_SPIN = 3;     // deg of disc-spin kick
+// Card-draw hover: every non-front card slides right; the one visible card
+// nearest the camera stays in place and responds with restrained depth only.
+const DRAW_X = 240;       // px to the right for non-front cards
+const DRAW_Z = 56;        // subtle lift toward the viewer
+const DRAW_LIFT = 10;     // px upward
+const DRAW_SCALE = 0.015;
+const FRONT_DRAW_Z = 32;
+const FRONT_DRAW_SCALE = 0.01;
+
+const getCardOpacity = (offset) => {
+  let opacity = 1;
+  if (offset > 2.5) opacity = 1 - (offset - 2.5) * 1.5;
+  if (offset < -1.5) opacity = 1 - Math.abs(offset + 1.5) * 2;
+  return Math.max(0, opacity);
+};
 
 export default function Overview3D() {
   const navigate = useNavigate();
@@ -28,10 +37,12 @@ export default function Overview3D() {
   const targetScroll = useRef(0);        // target (for smooth lerp)
   const cardEls = useRef([]);
   const rafId = useRef(null);
+  const touchY = useRef(null);
+  const touchStartY = useRef(null);
+  const didTouchMove = useRef(false);
   // Per-card hover factor (0..1). The rAF layout loop owns every transform,
   // so hover is folded into the layout math instead of tweening the element
-  // directly (which the loop would overwrite each frame). `back.out` easing
-  // overshoots past 1, which is what gives the throw its kinetic snap.
+  // directly (which the loop would overwrite each frame).
   const hoverAmts = useRef(projects.map(() => ({ v: 0 })));
 
   // Position all cards based on the current virtual scroll offset
@@ -41,9 +52,35 @@ export default function Overview3D() {
     if (!total) return;
 
     const mid = (total - 1) / 2;
+    const half = total / 2;
+    const viewportWidth = containerRef.current?.clientWidth ?? CARD_W + 48;
+    const isMobile = viewportWidth < 640;
+    const isResponsive = viewportWidth < 1100;
+    const tabletProgress = Math.max(0, Math.min(1, (viewportWidth - 640) / 460));
+    const cardScale = isMobile
+      ? Math.min(0.62, Math.max(0.44, (viewportWidth - 48) / CARD_W))
+      : isResponsive
+        ? 0.68 + tabletProgress * 0.32
+        : 1;
+    const spacingScale = isMobile ? 0.64 : cardScale;
+    const offsets = cards.map((_, i) => {
+      const rawOffset = (i - mid) - scrollPos.current;
+      return ((rawOffset + half) % total + total) % total - half;
+    });
+
+    // Exactly one card owns the front interaction: the visible card nearest
+    // the camera. This matches the card the eye reads as the top of the deck,
+    // while excluding cards that have already faded out near the camera.
+    const frontIndex = offsets.reduce((closestIndex, offset, i) => {
+      if (getCardOpacity(offset) < 0.3) return closestIndex;
+      if (closestIndex === -1 || offset < offsets[closestIndex]) return i;
+      return closestIndex;
+    }, -1);
 
     cards.forEach((card, i) => {
       if (!card) return;
+      const draw = card.querySelector('.tunnel-card-draw');
+      if (!draw) return;
 
       // Base rotation — elevated bird's eye, cards upright
       const baseRotX = 8;
@@ -52,21 +89,15 @@ export default function Overview3D() {
 
       // The core math: the physical index minus the midpoint, shifted by the scroll amount.
       // When scrollPos increases (scrolling down), 'offset' becomes more negative
-      let offset = (i - mid) - scrollPos.current;
-
-      // INFINITE WRAP MAGIC:
-      // We want the offset to forever loop between roughly -total/2 and +total/2
-      const half = total / 2;
-      // standard positive modulo hack
-      offset = ((offset + half) % total + total) % total - half;
+      const offset = offsets[i];
 
       // offset now smoothly sweeps from +4 down to -4, then snaps back to +4
       // -negative offset = close to camera (Z is positive)
       // +positive offset = deep in background (Z is negative)
 
-      const zShift = offset * -280;
-      const xShift = offset * 180;
-      const yShift = offset * -55;
+      const zShift = offset * -280 * spacingScale;
+      const xShift = offset * 180 * spacingScale;
+      const yShift = offset * -55 * spacingScale;
 
       // PERSPECTIVE-SHEAR COMPENSATION:
       // Every card shares the same base rotation, but perspective projects
@@ -80,28 +111,33 @@ export default function Overview3D() {
       const compX = Math.atan2(yShift, depth) * DEG;
 
       // Smooth opacity fading at the absolute front and back of the queue
-      let opacity = 1;
-      // Fade out as it wraps to the back of the line
-      if (offset > 2.5) opacity = 1 - (offset - 2.5) * 1.5;
-      // Fade out as it passes behind the camera
-      if (offset < -1.5) opacity = 1 - Math.abs(offset + 1.5) * 2;
-      opacity = Math.max(0, opacity);
+      const opacity = getCardOpacity(offset);
 
       const hover = hoverAmts.current[i]?.v ?? 0;
+      const isFront = i === frontIndex;
 
       gsap.set(card, {
-        rotationX: baseRotX + compX - hover * THROW_PITCH,
-        rotationY: baseRotY - compY + hover * THROW_YAW,
-        rotationZ: baseRotZ + hover * THROW_SPIN,
-        z: zShift + hover * THROW_Z,
+        rotationX: baseRotX + compX,
+        rotationY: baseRotY - compY,
+        rotationZ: baseRotZ,
+        z: zShift,
         x: xShift,
-        y: yShift - hover * THROW_LIFT,
-        scale: 1 + hover * 0.04,
+        y: yShift,
+        scale: cardScale,
         opacity,
         // Faded-out cards must not swallow hover/clicks
         pointerEvents: opacity < 0.3 ? 'none' : 'auto',
         // z-index must be highest for cards closest to camera (most negative offset)
         zIndex: Math.round((half - offset) * 100 + hover * 1000),
+      });
+
+      // The outer card remains a stable hover target while the visible face
+      // and its callout draw out together in the card's local 3D plane.
+      gsap.set(draw, {
+        z: hover * (isFront ? FRONT_DRAW_Z : DRAW_Z),
+        x: isFront ? 0 : hover * DRAW_X * cardScale,
+        y: isFront ? 0 : -hover * DRAW_LIFT,
+        scale: 1 + hover * (isFront ? FRONT_DRAW_SCALE : DRAW_SCALE),
       });
     });
   }, []);
@@ -126,6 +162,28 @@ export default function Overview3D() {
       targetScroll.current += e.deltaY * 0.002;
     };
 
+    const handleTouchStart = (e) => {
+      const nextY = e.touches[0]?.clientY;
+      if (nextY == null) return;
+      touchY.current = nextY;
+      touchStartY.current = nextY;
+      didTouchMove.current = false;
+    };
+
+    const handleTouchMove = (e) => {
+      const nextY = e.touches[0]?.clientY;
+      if (nextY == null || touchY.current == null) return;
+      e.preventDefault();
+      if (Math.abs(nextY - touchStartY.current) > 6) didTouchMove.current = true;
+      targetScroll.current += (touchY.current - nextY) * 0.006;
+      touchY.current = nextY;
+    };
+
+    const handleTouchEnd = () => {
+      touchY.current = null;
+      touchStartY.current = null;
+    };
+
     // Smooth animation loop: lerp toward target scroll
     const tick = () => {
       scrollPos.current += (targetScroll.current - scrollPos.current) * 0.08;
@@ -139,22 +197,32 @@ export default function Overview3D() {
     if (container) {
       // Use wheel event (passive: false is REQUIRED to use preventDefault and block native scroll)
       container.addEventListener('wheel', handleWheel, { passive: false });
+      container.addEventListener('touchstart', handleTouchStart, { passive: true });
+      container.addEventListener('touchmove', handleTouchMove, { passive: false });
+      container.addEventListener('touchend', handleTouchEnd, { passive: true });
+      container.addEventListener('touchcancel', handleTouchEnd, { passive: true });
     }
 
     // (Mouse parallax removed: cards stand completely static when cursor moves)
 
     return () => {
-      if (container) container.removeEventListener('wheel', handleWheel);
+      if (container) {
+        container.removeEventListener('wheel', handleWheel);
+        container.removeEventListener('touchstart', handleTouchStart);
+        container.removeEventListener('touchmove', handleTouchMove);
+        container.removeEventListener('touchend', handleTouchEnd);
+        container.removeEventListener('touchcancel', handleTouchEnd);
+      }
       if (rafId.current) cancelAnimationFrame(rafId.current);
     };
   }, { scope: containerRef });
 
-  // ── Disc-throw hover + callout ──
+  // ── Card-draw hover + callout ──
   const handleCardEnter = (index, card) => {
+    if (window.matchMedia('(hover: none)').matches) return;
     const amt = hoverAmts.current[index];
     gsap.killTweensOf(amt);
-    // Fast fling with overshoot — reads as "thrown", not "scaled up"
-    gsap.to(amt, { v: 1, duration: 0.55, ease: 'back.out(2.4)' });
+    gsap.to(amt, { v: 1, duration: 0.45, ease: 'power3.out' });
 
     const callout = card.querySelector('.callout');
     const path = card.querySelector('.callout-path');
@@ -182,19 +250,28 @@ export default function Overview3D() {
   };
 
   const handleCardLeave = (index, card) => {
+    if (window.matchMedia('(hover: none)').matches) return;
     const amt = hoverAmts.current[index];
     gsap.killTweensOf(amt);
-    gsap.to(amt, { v: 0, duration: 0.5, ease: 'power3.out' });
+    gsap.to(amt, { v: 0, duration: 0.4, ease: 'power3.out' });
 
     const callout = card.querySelector('.callout');
     gsap.killTweensOf(callout);
     gsap.to(callout, { autoAlpha: 0, duration: 0.2, ease: 'power2.in' });
   };
 
+  const handleCardClick = (slug) => {
+    if (didTouchMove.current) {
+      didTouchMove.current = false;
+      return;
+    }
+    curtainTransition(() => navigate(`/work/${slug}`));
+  };
+
   return (
     <div
       ref={containerRef}
-      className="w-full h-full flex items-center justify-center overflow-hidden cursor-ns-resize"
+      className="w-full h-full flex items-center justify-center overflow-hidden cursor-default md:cursor-ns-resize touch-none"
       style={{ perspective: `${PERSPECTIVE}px`, perspectiveOrigin: '50% 15%' }}
     >
       <div
@@ -209,7 +286,7 @@ export default function Overview3D() {
         {projects.map((project, index) => (
           <div
             key={project.id}
-            onClick={() => curtainTransition(() => navigate(`/work/${project.slug}`))}
+            onClick={() => handleCardClick(project.slug)}
             onMouseEnter={(e) => handleCardEnter(index, e.currentTarget)}
             onMouseLeave={(e) => handleCardLeave(index, e.currentTarget)}
             className="tunnel-card absolute cursor-pointer group"
@@ -223,15 +300,21 @@ export default function Overview3D() {
               transformOrigin: 'center center',
             }}
           >
-            {/* Card face — clipping/rounding lives here so the callout can overflow the card */}
             <div
-              className="relative w-full h-full rounded-xl overflow-hidden border border-white/[0.08] shadow-2xl"
-              style={{ transform: 'translateZ(0)' /* Mitigate Chrome/Safari border-radius rendering bugs */ }}
+              className="tunnel-card-draw relative w-full h-full"
+              style={{ transformStyle: 'preserve-3d', transformOrigin: 'center center' }}
             >
+              {/* Card face — clipping/rounding lives here so the callout can overflow the card */}
+              <div
+                className="relative w-full h-full rounded-xl overflow-hidden border border-white/[0.08] shadow-2xl"
+                style={{ transform: 'translateZ(0)' /* Mitigate Chrome/Safari border-radius rendering bugs */ }}
+              >
               {project.image ? (
                 <>
                   {/* Depth overlay — gets darker for deeper cards */}
                   <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors duration-500 z-10" />
+                  {/* Permanent contrast behind titles on bright cover art */}
+                  <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/90 via-black/45 to-transparent z-10 pointer-events-none" />
 
                   {/* Project image */}
                   <img
@@ -294,27 +377,26 @@ export default function Overview3D() {
                   </div>
                 </div>
               )}
-            </div>
+              </div>
 
-            {/* Floating callout — angular leader line + compact metadata tag.
-                Lives in the card's 3D plane, so it tilts with the card and
-                straightens as the throw turns the card toward the viewer. */}
-            <div
-              className="callout absolute -top-12 right-8 opacity-0 pointer-events-none"
-              style={{ width: 200, height: 60 }}
-            >
+            {/* Floating callout — angular leader line + project identity.
+                Lives in the card's 3D plane so it preserves the card's angle. */}
+              <div
+                className="callout absolute -top-16 right-6 opacity-0 pointer-events-none"
+                style={{ width: 280, height: 76 }}
+              >
               <svg
                 className="absolute inset-0 overflow-visible"
-                width="200"
-                height="60"
-                viewBox="0 0 200 60"
+                width="280"
+                height="76"
+                viewBox="0 0 280 76"
                 fill="none"
                 aria-hidden="true"
               >
                 {/* Bent-wire leader: vertical rise, 45° fold, horizontal run */}
                 <path
                   className="callout-path"
-                  d="M8 68 L8 42 L34 18 L196 18"
+                  d="M8 84 L8 50 L40 18 L276 18"
                   stroke="#C6FF00"
                   strokeWidth="1.5"
                   pathLength="1"
@@ -325,17 +407,23 @@ export default function Overview3D() {
                 <rect
                   className="callout-marker"
                   x="4"
-                  y="64"
+                  y="80"
                   width="8"
                   height="8"
-                  transform="rotate(45 8 68)"
+                  transform="rotate(45 8 84)"
                   fill="#C6FF00"
                 />
               </svg>
               <div
-                className="callout-label absolute right-0 top-[18px] -translate-y-1/2 opacity-0 bg-black/85 backdrop-blur-sm border border-neon/50 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.25em] text-neon whitespace-nowrap"
+                className="callout-label absolute right-0 top-[18px] -translate-y-1/2 opacity-0 min-w-[218px] bg-black/90 backdrop-blur-sm border border-neon/50 px-3 py-2 font-mono whitespace-nowrap"
               >
-                0{project.id} · {project.category}
+                <span className="block text-[11px] font-semibold tracking-[0.06em] text-white">
+                  {project.title}
+                </span>
+                <span className="mt-1 block text-[9px] uppercase tracking-[0.2em] text-neon">
+                  0{project.id} · {project.category}
+                </span>
+              </div>
               </div>
             </div>
           </div>

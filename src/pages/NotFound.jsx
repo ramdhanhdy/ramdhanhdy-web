@@ -32,12 +32,12 @@ export default function NotFound() {
   return (
     <div
       ref={containerRef}
-      className="w-full h-screen bg-black flex flex-col items-center justify-center gap-10 px-8"
+      className="w-full h-screen h-dvh bg-black flex flex-col items-center justify-center gap-8 sm:gap-10 px-6 sm:px-8 pt-16"
     >
       <Meta title="404" description="Nothing here." />
 
       <svg
-        className="nf-star nf-reveal w-16 h-16 text-neon"
+        className="nf-star nf-reveal w-12 h-12 sm:w-16 sm:h-16 text-neon"
         viewBox="0 0 24 24"
         fill="currentColor"
         aria-hidden="true"
@@ -45,7 +45,7 @@ export default function NotFound() {
         <path d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z" />
       </svg>
 
-      <h1 className="nf-reveal text-7xl md:text-9xl font-semibold tracking-tighter text-white">
+      <h1 className="nf-reveal text-6xl sm:text-7xl md:text-9xl font-semibold tracking-tighter text-white">
         404
       </h1>
       <p className="nf-reveal font-mono text-sm uppercase tracking-widest text-zinc-500">

@@ -43,12 +43,12 @@ export default function PostDetail() {
   if (!post) return <NotFound />;
 
   return (
-    <div ref={containerRef} className="w-full h-screen overflow-hidden bg-black">
+    <div ref={containerRef} className="w-full h-screen h-dvh overflow-hidden bg-black">
       <Meta title={post.title} description={post.summary} type="article" />
 
       <div
         key={slug}
-        className="w-full h-full overflow-y-auto no-scrollbar pt-32 pb-24 px-6 md:px-12"
+        className="w-full h-full overflow-y-auto no-scrollbar pt-28 sm:pt-32 pb-20 sm:pb-24 px-5 sm:px-6 md:px-12"
         style={{
           maskImage: 'linear-gradient(to bottom, transparent 0%, black 120px)',
           WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 120px)',
@@ -59,7 +59,7 @@ export default function PostDetail() {
             <span className="font-mono text-sm text-neon/80">
               {formatDate(post.date)}
             </span>
-            <h1 className="text-4xl md:text-6xl font-semibold tracking-tighter text-white leading-[1.05]">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-semibold tracking-tighter text-white leading-[1.05] break-words">
               {post.title}
             </h1>
             {post.summary && (

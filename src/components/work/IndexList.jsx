@@ -94,7 +94,7 @@ export default function IndexList() {
   return (
     <div 
       ref={containerRef} 
-      className="w-full h-full flex items-start justify-center pt-32 pb-24 px-8 overflow-y-auto no-scrollbar"
+      className="w-full h-full flex items-start justify-center pt-28 sm:pt-32 pb-24 px-4 sm:px-8 overflow-y-auto no-scrollbar"
       style={{
         maskImage: 'linear-gradient(to bottom, transparent 0%, black 120px)',
         WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 120px)'
@@ -103,7 +103,7 @@ export default function IndexList() {
       <div className="w-full max-w-5xl flex flex-col gap-2 group/list">
         
         {/* Table Header */}
-        <div className="grid grid-cols-12 gap-4 pb-4 px-4 border-b border-zinc-800 text-xs uppercase tracking-widest text-zinc-500 mb-4 list-item">
+        <div className="grid grid-cols-12 gap-2 sm:gap-4 pb-4 px-2 sm:px-4 border-b border-zinc-800 text-[10px] sm:text-xs uppercase tracking-widest text-zinc-500 mb-4 list-item">
           <div className="col-span-1 sm:col-span-1">ID</div>
           <div className="col-span-9 sm:col-span-10">Project</div>
           <div className="col-span-2 sm:col-span-1 text-right">Year</div>
@@ -114,32 +114,32 @@ export default function IndexList() {
           <a
             key={project.id}
             href={`/work/${project.slug}`}
-            className="list-item group grid grid-cols-12 gap-4 py-8 px-4 rounded-xl border-b border-zinc-800/50 hover:border-transparent hover:bg-neon items-start cursor-pointer transition-colors duration-300 group-hover/list:opacity-30 hover:!opacity-100"
+            className="list-item group grid grid-cols-12 gap-2 sm:gap-4 py-6 sm:py-8 px-2 sm:px-4 rounded-xl border-b border-zinc-800/50 hover:border-transparent hover:bg-neon items-start cursor-pointer transition-colors duration-300 group-hover/list:opacity-30 hover:!opacity-100"
             onClick={(e) => handleRowClick(e, project.slug)}
             onMouseEnter={() => handleMouseEnter(project)}
             onMouseLeave={handleMouseLeave}
           >
-            <div className="col-span-1 sm:col-span-1 text-zinc-600 group-hover:text-zinc-900 transition-colors font-mono text-sm pt-5">
+            <div className="col-span-1 text-zinc-600 group-hover:text-zinc-900 transition-colors font-mono text-xs sm:text-sm pt-2 sm:pt-5">
               0{project.id}
             </div>
             <div className="col-span-9 sm:col-span-10 flex flex-col gap-3 sm:gap-5">
-              <div className="text-4xl sm:text-5xl lg:text-7xl font-medium tracking-tight leading-[1.1] text-zinc-400 group-hover:text-zinc-900 transition-colors duration-300">
+              <div className="text-[2rem] sm:text-5xl lg:text-7xl font-medium tracking-tight leading-[1.08] text-zinc-400 group-hover:text-zinc-900 transition-colors duration-300 break-words">
                 {project.title}
               </div>
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 mt-1">
-                <div className="text-sm text-zinc-500 group-hover:text-zinc-800 transition-colors uppercase tracking-widest flex items-center gap-2">
+                <div className="text-[10px] sm:text-sm text-zinc-500 group-hover:text-zinc-800 transition-colors uppercase tracking-widest flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-neon group-hover:bg-zinc-800 transition-colors"></div>
                   {project.category}
                 </div>
                 {project.role && (
-                  <div className="text-sm text-zinc-500 group-hover:text-zinc-800 transition-colors uppercase tracking-widest flex items-center gap-2">
+                  <div className="text-[10px] sm:text-sm text-zinc-500 group-hover:text-zinc-800 transition-colors uppercase tracking-widest flex items-center gap-2">
                     <div className="w-1.5 h-1.5 rounded-full bg-zinc-700 group-hover:bg-zinc-800/50 transition-colors"></div>
                     {project.role}
                   </div>
                 )}
               </div>
             </div>
-            <div className="col-span-2 sm:col-span-1 text-right text-sm text-zinc-500 group-hover:text-zinc-900 transition-colors pt-5">
+            <div className="col-span-2 sm:col-span-1 text-right text-xs sm:text-sm text-zinc-500 group-hover:text-zinc-900 transition-colors pt-2 sm:pt-5">
               {project.year}
             </div>
           </a>
@@ -149,7 +149,7 @@ export default function IndexList() {
       {/* Floating Preview — image or text card depending on project */}
       <div 
         ref={imageRef}
-        className="fixed top-0 left-0 w-[300px] h-[200px] pointer-events-none z-50 opacity-0 scale-75 shadow-2xl rounded-sm overflow-hidden bg-zinc-900 border border-zinc-800"
+        className="hidden md:block fixed top-0 left-0 w-[300px] h-[200px] pointer-events-none z-50 opacity-0 scale-75 shadow-2xl rounded-sm overflow-hidden bg-zinc-900 border border-zinc-800"
       >
         {activeProject?.image ? (
           <div className="w-full h-full relative">

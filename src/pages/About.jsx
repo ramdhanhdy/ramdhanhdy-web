@@ -100,7 +100,7 @@ export default function About() {
   return (
     <div
       ref={containerRef}
-      className="w-full bg-black relative h-screen overflow-hidden"
+      className="w-full bg-black relative h-screen h-dvh overflow-hidden"
     >
       <Meta
         title="About"
@@ -122,11 +122,11 @@ export default function About() {
         */}
         <div
           ref={contentRef}
-          className="max-w-4xl mx-auto w-full px-6 md:px-12 flex flex-col pt-32 pb-24"
+          className="max-w-4xl mx-auto w-full px-5 sm:px-6 md:px-12 flex flex-col pt-28 sm:pt-32 pb-20 sm:pb-24"
         >
           <div
             ref={textRef}
-            className="text-2xl md:text-3xl lg:text-[2.5rem] leading-[1.3] font-medium tracking-tight cursor-default"
+            className="text-[1.4rem] sm:text-2xl md:text-3xl lg:text-[2.5rem] leading-[1.32] font-medium tracking-tight cursor-default"
           >
             {paragraphs.map((p, i) => (
               <TextReveal key={i}>{p}</TextReveal>
