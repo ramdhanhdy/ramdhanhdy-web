@@ -10,7 +10,7 @@ const paragraphs = [
   "I started my journey in theoretical physics, fascinated by the fundamental laws governing reality. That obsession with complex systems naturally evolved into an extensive career in AI Engineering and Data Science. I specialize in crafting immersive, highly interactive web experiences with a strong focus on algorithmic efficiency, elegant architectures, and dynamic integrations.",
   "My goal is to build agentic workflows that bridge the gap between abstract mathematics and tangible, human-centric solutions. I believe in creating remarkable digital experiences that connect in authentic and memorable ways.",
   "I’m passionate about the intersection of deep learning and beautiful user interfaces. Whether it’s a massive data pipeline that powers a dashboard or a complex multi-agent reasoning model, I focus on precision, fluidity, and cutting-edge logic.",
-  "Beyond the screen, I find inspiration in the patterns of nature—analyzing complex systems, hiking new trails, and continuously pushing the boundaries of what creative coding can achieve.",
+  "Beyond the screen, I find inspiration in the patterns of nature: analyzing complex systems, hiking new trails, and continuously pushing the boundaries of what creative coding can achieve.",
 ];
 
 // Helper to gracefully split text into animated words and characters
@@ -52,7 +52,7 @@ export default function About() {
       // Target: ~15% of characters lit at scroll 0.
       // Based on reading research: visual span ~10 chars/fixation, optimal line
       // length 50-75 CPL (sweet spot ~66), reading speed ~238 wpm non-fiction.
-      // 15% of ~920 total chars ≈ 138 chars ≈ 2 lines — enough head start so the
+      // 15% of ~920 total chars ≈ 138 chars ≈ 2 lines, enough head start so the
       // lit text stays ahead of the reader's current position.
       const INITIAL_LIT_RATIO = 0.15;
 

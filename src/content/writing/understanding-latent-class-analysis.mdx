@@ -6,7 +6,7 @@ summary: How latent class analysis uncovers hidden population segments through p
 draft: false
 ---
 
-Latent Class Analysis (LCA) is a powerful statistical method used to uncover hidden subgroups within a larger population based on their responses to specific indicators. This technique is particularly useful for identifying distinct groups, or “latent classes,” that share similar characteristics—even when those characteristics are not immediately obvious.
+Latent Class Analysis (LCA) is a powerful statistical method used to uncover hidden subgroups within a larger population based on their responses to specific indicators. This technique is particularly useful for identifying distinct groups, or “latent classes,” that share similar characteristics, even when those characteristics are not immediately obvious.
 
 In this article, we will explore LCA in detail, use a contextual example to illustrate its application, and introduce some of the mathematical concepts behind it.
 
@@ -20,7 +20,7 @@ Using a set of observed indicators, LCA models identify the solution that best d
 
 ![An observed distribution formed by two overlapping latent class distributions.](/lca-latent-classes.jpg)
 
-*Figure 1 — Latent classes in LCA.*
+*Figure 1: Latent classes in LCA.*
 
 ## Contextual Example: Customer Segments in a Retail Store
 
@@ -34,7 +34,7 @@ The image below illustrates the LCA process at a high level.
 
 ![A diverse initial customer population separated by latent class analysis into three preference-based groups.](/lca-retail-segmentation.png)
 
-*Figure 2 — LCA separates an observed population into unobserved customer segments.*
+*Figure 2: LCA separates an observed population into unobserved customer segments.*
 
 The **initial population** consists of diverse customers, represented by the circle on the left. Each dot inside the circle corresponds to a customer’s preferences across indicators A, B, and C.
 
@@ -50,7 +50,7 @@ LCA involves several key mathematical concepts. Let’s walk through them using 
 
 ### 1. Latent Variables
 
-In LCA, the latent variable represents each individual’s class membership. In our retail example, the latent variable indicates which shopping-preference class—electronics, clothing, or groceries—a customer belongs to.
+In LCA, the latent variable represents each individual’s class membership. In our retail example, the latent variable indicates a customer’s shopping-preference class, such as electronics, clothing, or groceries.
 
 ### 2. Indicator Variables
 
@@ -70,7 +70,7 @@ Where:
 
 - *Y* represents the observed indicator variables: preferences for electronics, clothing, and groceries.
 - *C* represents latent class membership: the preference class to which a customer belongs.
-- *k* is the number of latent classes—three in our example.
+- *k* is the number of latent classes, which is three in our example.
 - *P(Y = y | C = j)* is the conditional probability of the observed response pattern given latent class *j*. For example, it is the probability that a customer prefers electronics if they belong to the electronics class.
 - *P(C = j)* is the probability of latent class *j*, such as the overall proportion of customers in the electronics class.
 
@@ -80,7 +80,7 @@ The parameters of the LCA model, including class probabilities and the condition
 
 In Latent Class Analysis, probability scores play a crucial role in determining the likelihood that an individual belongs to a specific latent class or segment. Instead of directly assigning individuals to a single class, LCA **generates membership probabilities** for every class identified by the model.
 
-When LCA is applied to a dataset, it calculates the probability of each individual—for example, a customer—belonging to each latent class based on their observed characteristics or preferences. This provides a more nuanced understanding of the data because individuals may exhibit traits that align with multiple segments to varying degrees.
+When LCA is applied to a dataset, it calculates the probability that each individual belongs to each latent class based on their observed characteristics or preferences. For example, it can estimate these probabilities for a customer. This provides a more nuanced understanding of the data because individuals may exhibit traits that align with multiple segments to varying degrees.
 
 Consider a customer who has shown a preference for both electronics and clothing. LCA might assign a 95% probability that this customer belongs to the “Electronics Enthusiasts” segment and only a 5% probability that they belong to the “Clothing Shoppers” segment. This makes it clear that the customer is most likely an electronics enthusiast.
 
@@ -88,15 +88,15 @@ For a newer customer, or one with unusual shopping patterns, the probabilities m
 
 ![Two retail customers with confident and ambiguous latent class membership scores.](/lca-probability-scores.jpg)
 
-*Figure 3 — LCA expresses class membership as probabilities rather than an unconditional hard assignment.*
+*Figure 3: LCA expresses class membership as probabilities rather than an unconditional hard assignment.*
 
-In such cases, LCA makes it possible to identify—and potentially exclude—customers who do not display a strong preference for any one segment. This allows the store to focus on customers with clear segment behaviors, which is crucial for targeted marketing and inventory management. Strategically, it helps the store understand where each customer most likely belongs and tailor its marketing and product offerings accordingly.
+In such cases, LCA can identify customers who do not display a strong preference for any one segment. They can then be excluded if needed. This allows the store to focus on customers with clear segment behaviors, which is crucial for targeted marketing and inventory management. Strategically, it helps the store understand where each customer most likely belongs and tailor its marketing and product offerings accordingly.
 
 ## Why LCA?
 
 LCA can be considered a significant improvement over clustering techniques such as K-means and hierarchical clustering because it takes a fundamentally different approach to segmentation.
 
-Instead of using variables to directly define segments, as K-means does, LCA assumes that scores on the variables are caused by a hidden—or latent—segment. Specifically, LCA posits the existence of a latent categorical variable that maximizes the likelihood of observing the scores found in the measured variables.
+Instead of using variables to directly define segments, as K-means does, LCA assumes that scores on the variables are caused by a hidden segment, also called a latent segment. Specifically, LCA posits the existence of a latent categorical variable that maximizes the likelihood of observing the scores found in the measured variables.
 
 This means that LCA is a statistical technique rather than a distance-based mathematical technique like hierarchical or K-means clustering. To understand the distinction:
 

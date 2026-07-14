@@ -2,7 +2,7 @@
 title: "The Limitations of Averages: Why A/B Testing Fails Personalization"
 slug: limitations-of-averages-ab-testing-personalization
 date: "2025-08-23"
-summary: Why population-level averages obscure customer heterogeneity—and what true personalization requires instead.
+summary: Why population-level averages obscure customer heterogeneity, and what true personalization requires instead.
 draft: false
 ---
 
@@ -20,13 +20,13 @@ When you’re relying solely on the average preference, you’ve inadvertently a
 
 ![Two distinct coffee preference groups with an overall average that represents neither group.](/ab-testing-average-taste.png)
 
-*Fig. 1 — The overall “average taste” (dashed line) falls between two real groups. Great for no one, accurate for no one.*
+*Fig. 1: The overall “average taste” (dashed line) falls between two real groups. Great for no one, accurate for no one.*
 
 As Figure 1 illustrates, this simple coffee shop example reveals a fundamental limitation of traditional A/B testing, especially in the context of personalization. While A/B testing is a powerful tool for comparing the overall performance of different options, it often falls short when dealing with the diverse and nuanced preferences of individual customers.
 
 ![A/B test results where the winning variant changes when customers are examined by segment.](/ab-testing-segment-winners.png)
 
-*Fig. 2 — Per-segment winners flip the “combined” winner. Averages can mislead personalization decisions.*
+*Fig. 2: Per-segment winners flip the “combined” winner. Averages can mislead personalization decisions.*
 
 This article will delve deeper into the statistical and practical reasons why A/B testing, in isolation, is insufficient for achieving true personalization. Averages can often obscure the insights needed to see how to create individual experiences, so it is important to look beyond the averages.
 
@@ -40,15 +40,15 @@ Figure 3 demonstrates this perfectly: Treatment wins in both Group A and Group B
 
 ![Treatment wins within two separate groups while control appears to win in the combined results, illustrating Simpson’s Paradox.](/ab-testing-simpsons-paradox.png)
 
-*Fig. 3 — A trend that holds within groups can reverse when combined (Simpson’s Paradox).*
+*Fig. 3: A trend that holds within groups can reverse when combined (Simpson’s Paradox).*
 
 Another critical pitfall is the distinction between statistical significance and practical significance. As shown in Figure 4, a variant might win an A/B test with a statistically significant margin when you have a large enough sample size.
 
-However, that 0.1% improvement might be statistically significant but practically meaningless—economically trivial. The Power/MDE curve below reveals how massive sample sizes can make tiny effects appear “significant,” while the confidence intervals show substantial overlap between variants. This highlights why we must always pair effect size with confidence intervals and minimum detectable effect (MDE) thresholds.
+However, that 0.1% improvement might be statistically significant but practically meaningless, making it economically trivial. The Power/MDE curve below reveals how massive sample sizes can make tiny effects appear “significant,” while the confidence intervals show substantial overlap between variants. This highlights why we must always pair effect size with confidence intervals and minimum detectable effect (MDE) thresholds.
 
 ![A power and minimum detectable effect comparison showing how a tiny lift can become statistically significant with a very large sample.](/ab-testing-practical-significance.png)
 
-*Fig. 4 — A 0.1% lift can be “significant” with huge N, yet economically trivial. Always pair effect size with confidence intervals and MDE.*
+*Fig. 4: A 0.1% lift can be “significant” with huge N, yet economically trivial. Always pair effect size with confidence intervals and MDE.*
 
 ## 2. Customer Heterogeneity: The Elephant in the Room
 
@@ -62,7 +62,7 @@ Think about the following examples:
 
 ![Examples showing that different customer segments prefer different e-commerce, email, and interface variants.](/ab-testing-personalized-variants.png)
 
-*Fig. 6 — The “right” variant depends on who’s seeing it.*
+*Fig. 6: The “right” variant depends on who’s seeing it.*
 
 As Figure 6 clearly demonstrates, the “right” variant depends entirely on who’s seeing it. In each scenario, a one-size-fits-all approach based on average customer preference would inevitably disappoint significant segments of your audience, which is exactly the trap that traditional A/B testing creates.
 
@@ -79,7 +79,7 @@ The A/B test results show that Variant A performs slightly better overall, with 
 
 ![A waterfall chart showing how strong gains for one customer segment and losses for another combine into an overall two-percent lift.](/ab-testing-weighted-lift.png)
 
-*Fig. 7 — The overall +2% is the weighted mix of strong gains and quiet losses.*
+*Fig. 7: The overall +2% is the weighted mix of strong gains and quiet losses.*
 
 However, a deeper analysis reveals a different story. When segmenting the results by age, it turns out that:
 
@@ -88,9 +88,9 @@ However, a deeper analysis reveals a different story. When segmenting the result
 
 ![Segmented A/B test results showing different winning variants for customers under and over 30.](/ab-testing-segment-results.png)
 
-*Fig. 8 — Within segments, winners are clear but not the same.*
+*Fig. 8: Within segments, winners are clear but not the same.*
 
-When relying only on the overall average—just like our coffee shop owner in Figure 1—the retailer made a decision that actually harmed its performance among older customers, who might represent a significant portion of its revenue.
+When relying only on the overall average, just like our coffee shop owner in Figure 1, the retailer made a decision that actually harmed its performance among older customers, who might represent a significant portion of its revenue.
 
 The waterfall chart in Figure 7 reveals how the weighted mix of strong gains (+5% from 40% of users) and quiet losses (-3% from 60% of users) created an overall positive result that masked significant segment-level harm.
 
@@ -98,7 +98,7 @@ Figure 8 makes this crystal clear: within each segment, the winners are clear, b
 
 ## 4. The Need for a More Granular Approach
 
-This case study underscores the need to move beyond population-level optimization and embrace a more granular approach that accounts for individual differences. Personalization requires understanding that different customers—or customer segments—may respond differently to the same stimuli.
+This case study underscores the need to move beyond population-level optimization and embrace a more granular approach that accounts for individual differences. Personalization requires understanding that different customers, or customer segments, may respond differently to the same stimuli.
 
 While a basic A/B test might tell you what works best on average, it doesn’t tell you why or for whom. To achieve true personalization, you need to:
 

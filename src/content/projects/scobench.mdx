@@ -14,7 +14,7 @@ stack: [TypeScript, Next.js, React, Tailwind CSS]
 LLMs tend to agree with the user even when the user is wrong. This sycophancy
 bias is well-documented but hard to measure systematically. Researchers and
 practitioners need a way to see which models are sycophantic, in which
-contexts, and by how much — without manually reading hundreds of responses.
+contexts, and by how much, all without manually reading hundreds of responses.
 
 ## Approach
 
@@ -22,11 +22,11 @@ SycoBench sends standardized prompts that contain intentional errors or
 opinions, then measures whether the model corrects, agrees, or hedges. The
 dashboard visualizes results across three dimensions:
 
-1. **Sycophancy Index** — A bar chart with risk-based color coding showing
+1. **Sycophancy Index**: A bar chart with risk-based color coding showing
    each model's overall sycophancy score.
-2. **Behavioral Quadrant** — A scatter plot mapping sycophancy vs stability,
+2. **Behavioral Quadrant**: A scatter plot mapping sycophancy vs stability,
    showing which models are consistent vs which flip-flop.
-3. **Elasticity Quadrant** — Advanced analysis of stance responsiveness and
+3. **Elasticity Quadrant**: Advanced analysis of stance responsiveness and
    topic consistency, measuring how much a model's stance shifts when the
    prompt's framing changes.
 

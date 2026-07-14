@@ -126,9 +126,14 @@ every `.tunnel-card`.
   `offset = ((offset + half) % total + total) % total - half`.
 - Offset drives placement: `z = offset * -280`, `x = offset * 180`,
   `y = offset * -55`. Negative offset = near camera.
-- Opacity fades at both ends: `offset > 2.5` (wrapping to back) and
-  `offset < -1.5` (passing the camera). Cards under 0.3 opacity get
-  `pointer-events: none` so invisible cards can't swallow hovers/clicks.
+- Opacity stays full through `abs(offset) <= 2.5`, then uses asymmetric
+  quadratic fades before reaching zero at `abs(offset) === 3.5` (the wrap
+  seam). The outgoing back card holds its opacity longer (`1 - progress²`),
+  while the recycled front card returns more cautiously (`(1 - progress)³`).
+  The near-camera rail is also compressed to 65% spacing after offset `-1.5`,
+  preserving separation while preventing the leading cards from growing or
+  reaching the viewport edge too quickly. Cards under 0.3 opacity get
+  `pointer-events: none` so nearly invisible cards can't swallow hovers/clicks.
 
 On touch screens, the same virtual scroll target is driven by vertical swipes:
 
@@ -140,9 +145,10 @@ On touch screens, the same virtual scroll target is driven by vertical swipes:
 
 ### 3c. Perspective-shear compensation (the "tilted image" fix)
 
-All cards share base rotation (`rotX 8, rotY -38, rotZ -2`), but CSS
+All cards share base rotation (`rotX -24, rotY -32, rotZ 13`) and a long-lens
+`3200px` perspective, but CSS
 perspective projects each card along a different sight line depending on its
-x/y offset from the perspective origin (`50% 15%`), which made some cards
+x/y offset from the perspective origin (`50% 50%`), which made some cards
 appear skewed. `layoutCards` compensates per card:
 
 ```js
@@ -163,6 +169,10 @@ the camera—the card the eye reads as the top of the deck—keeps its position 
 uses a restrained depth/scale response instead. Implementation:
 
 - `hoverAmts` — a ref holding one `{ v: 0 }` object per project.
+- `frontAmts` — a second per-card factor that eases between front (`1`) and
+  non-front (`0`) over 0.36s whenever scrolling changes `frontIndex`. The draw
+  transform interpolates through this factor so a hovered card never jumps
+  from x `0` directly to x `+240px` as its stack rank changes.
 - `handleCardEnter`: `v → 1`, `power3.out`, 0.45s.
 - `handleCardLeave`: `v → 0`, `power3.out`, 0.4s.
 - The outer `.tunnel-card` keeps the base carousel transform and remains a
@@ -205,7 +215,7 @@ fix).
 
 ### 3f. Misc invariants
 
-- Container: `perspective: ${PERSPECTIVE}px`, `perspectiveOrigin: '50% 15%'`,
+- Container: `perspective: ${PERSPECTIVE}px`, `perspectiveOrigin: '50% 50%'`,
   `cursor-ns-resize`. Stack wrapper: `transformStyle: 'preserve-3d'`.
 - Cards retain the 580×380 design coordinate system, but the rAF loop applies
   a viewport-derived outer scale below 1100px. Phones fit the card inside a

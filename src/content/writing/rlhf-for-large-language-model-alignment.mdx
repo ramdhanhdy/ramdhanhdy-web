@@ -8,7 +8,7 @@ draft: false
 
 ## 1. What Is RLHF, and Why Does LLM Alignment Matter?
 
-Let’s start with a scenario. Imagine you ask an AI assistant for advice on how to handle a difficult conversation at work. You want the answer to be helpful, kind, and rooted in good judgment. But the AI has read the entire internet during its training—including all the bad advice, rants, and toxic comments.
+Let’s start with a scenario. Imagine you ask an AI assistant for advice on how to handle a difficult conversation at work. You want the answer to be helpful, kind, and rooted in good judgment. But the AI has read the entire internet during its training. That includes all the bad advice, rants, and toxic comments.
 
 > How do we teach it the difference between what should be said and what shouldn’t?
 
@@ -22,9 +22,9 @@ Traditionally, we might try to hand-code specific rules or craft reward function
 
 ### Why Alignment Is Crucial
 
-Modern LLMs like GPT-4, Claude Sonnet, Grok, or Gemini are trained on trillions of words of internet text—good, bad, and ugly. This gives them remarkable capabilities but also leads to trouble: models can “hallucinate” facts, reflect societal biases, or occasionally spout harmful or offensive content.
+Modern LLMs like GPT-4, Claude Sonnet, Grok, or Gemini are trained on trillions of words of internet text, spanning the good, the bad, and the ugly. This gives them remarkable capabilities but also leads to trouble: models can “hallucinate” facts, reflect societal biases, or occasionally spout harmful or offensive content.
 
-Alignment is the process of fine-tuning these powerful models so their behavior lines up with what users—and society—consider helpful, honest, and harmless. RLHF has become the foundational approach to getting this right.
+Alignment is the process of fine-tuning these powerful models so their behavior lines up with what users and society consider helpful, honest, and harmless. RLHF has become the foundational approach to getting this right.
 
 ## How RLHF Works
 
@@ -46,17 +46,17 @@ Next, humans are shown multiple responses the model generated to the same prompt
 
 ![Human preference rankings are used to train a reward model.](/rlhf-reward-modeling.png)
 
-This step captures subtle, nuanced human judgments—understanding not just facts, but tone, appropriateness, and style.
+This step captures subtle, nuanced human judgments by understanding not just facts, but also tone, appropriateness, and style.
 
 ### c) Policy Optimization: “Learning to Do Better Each Time”
 
-Finally, reinforcement learning (usually Proximal Policy Optimization, or PPO) is used to update the original language model—pushing it to select outputs that will “score higher” with the reward model. Over time, the model learns to prefer outputs that align with human preferences and avoid those rated poorly.
+Finally, reinforcement learning (usually Proximal Policy Optimization, or PPO) is used to update the original language model. It pushes the model to select outputs that will “score higher” with the reward model. Over time, the model learns to prefer outputs that align with human preferences and avoid those rated poorly.
 
 ![Policy optimization improves the language model using scores from the reward model.](/rlhf-policy-optimization.png)
 
 ### Why Not Just Supervised Fine-Tuning?
 
-Because SFT teaches imitation, but it can’t easily teach the model what not to do, or how to make smarter choices in ambiguous, subjective situations. RLHF closes that gap by using both positive and negative feedback—doing more of what humans like, less of what they don’t.
+Because SFT teaches imitation, but it can’t easily teach the model what not to do, or how to make smarter choices in ambiguous, subjective situations. RLHF closes that gap by using both positive and negative feedback, doing more of what humans like and less of what they don’t.
 
 ## 3. RLHF in Action: Making AI Advice Safe and Useful
 
@@ -64,7 +64,7 @@ Let’s look at a real example.
 
 Say someone asks the AI: “What are healthy ways to lose weight?”
 
-If we just rely on internet data, the AI might stumble into recommending unsafe fad diets or supplements. But with RLHF, human labelers actively review the model’s suggestions—downvoting anything dangerous or unscientific, and upvoting responses that emphasize balanced nutrition, exercise, and consulting a doctor.
+If we just rely on internet data, the AI might stumble into recommending unsafe fad diets or supplements. But with RLHF, human labelers actively review the model’s suggestions, downvoting anything dangerous or unscientific and upvoting responses that emphasize balanced nutrition, exercise, and consulting a doctor.
 
 So after RLHF, the assistant’s answer is reliably something like:
 
@@ -74,7 +74,7 @@ That’s alignment in practice: the model isn’t just repeating what it read on
 
 ## 4. Beyond the Basics: Tweaking RLHF for Better Results
 
-### The Classic Approach—and Its Downsides
+### The Classic Approach and Its Downsides
 
 The original RLHF recipe uses PPO, a sophisticated RL algorithm that balances improvements with safety, but it’s complex, compute-hungry, and tricky to tune. As models get bigger, running all these training stages (including maintaining a separate “reward model” and “critic”) can be a bear.
 
@@ -84,14 +84,14 @@ To make RLHF more efficient, new approaches like Direct Preference Optimization 
 
 ![A comparison of PPO, DPO, and GRPO alignment methods.](/rlhf-methods-comparison.png)
 
-- **DPO:** Skips the explicit reinforcement loop—instead, directly optimizes the model on the human preference data, acting more like advanced supervised learning. It’s much less resource-intensive and stable, but very sensitive to the quality of those preference datasets.
-- **GRPO:** Still uses RL but gets rid of the “critic” by comparing groups of model outputs to each other, greatly saving memory. It’s especially promising for complex reasoning tasks—like solving math problems—where sampling multiple possible answers provides richer signals for learning.
+- **DPO:** Skips the explicit reinforcement loop. Instead, it directly optimizes the model on the human preference data, acting more like advanced supervised learning. It’s much less resource-intensive and stable, but very sensitive to the quality of those preference datasets.
+- **GRPO:** Still uses RL but gets rid of the “critic” by comparing groups of model outputs to each other, greatly saving memory. It’s especially promising for complex reasoning tasks such as solving math problems, where sampling multiple possible answers provides richer signals for learning.
 
 ### Trade-offs
 
 - **PPO:** More flexible, better for tough alignment jobs or complex data, but expensive and fiddly.
 - **DPO:** Simple, stable, and less demanding on hardware, but struggles if your preference data is noisy or missing important edge cases.
-- **GRPO:** Sits in between—efficient for certain tasks, but not as widely tested yet.
+- **GRPO:** Sits in between, efficient for certain tasks, but not as widely tested yet.
 
 > There’s no one-size-fits-all. Your choice depends on your alignment needs, available data, computing budget, and the problem you’re trying to solve.
 
@@ -101,7 +101,7 @@ While RLHF is powerful, it still faces big hurdles:
 
 - **Reward hacking:** Models can “game” the reward model, finding loopholes that technically score high but aren’t actually what humans want. Think overly verbose, flattering, or misleading responses.
 - **Human feedback is expensive and imperfect:** Collecting high-quality human preference data takes time and money; labelers are fallible, tired, or biased.
-- **Alignment tax:** Sometimes aligning a model for safety and helpfulness actually makes it less creative or less capable at unrelated tasks—a real challenge for general-purpose AI.
+- **Alignment tax:** Sometimes aligning a model for safety and helpfulness actually makes it less creative or less capable at unrelated tasks, which is a real challenge for general-purpose AI.
 - **Scaling:** Running RLHF on models with tens or hundreds of billions of parameters pushes technical and engineering limits.
 
 Researchers are actively exploring new reward modeling techniques, better ways to mix human and AI-generated feedback, and smarter alignment algorithms that are less vulnerable to these pitfalls.
@@ -111,20 +111,20 @@ Researchers are actively exploring new reward modeling techniques, better ways t
 Alignment is both an engineering challenge and a fundamental scientific problem. RLHF has taken us a giant leap forward, but open questions remain:
 
 - Can reward models become more robust, less hackable, and more representative of a wider range of human values?
-- How do we efficiently use human feedback when it’s so costly—but so vital?
+- How do we efficiently use human feedback when it is costly, yet vital?
 - Will new algorithms make alignment less of a trade-off, so we get models that are safe, helpful, and maximally capable?
 - And finally, as our models become more powerful, how do we ensure that they keep up with the changing, nuanced, and sometimes controversial landscape of human values themselves?
 
 ## TL;DR
 
-RLHF lets AI models “learn what people want”—by directly learning from examples of what real humans approve or reject.
+RLHF lets AI models “learn what people want” by directly learning from examples of what real humans approve or reject.
 
-It’s been crucial in making LLMs more helpful and safe, but brings complexity, trade-offs, and new challenges—particularly as models get bigger and the stakes get higher. There’s active research into simpler, safer, and more efficient RLHF methods, but full, robust alignment is still a frontier to be conquered.
+It’s been crucial in making LLMs more helpful and safe, but brings complexity, trade-offs, and new challenges, particularly as models get bigger and the stakes get higher. There’s active research into simpler, safer, and more efficient RLHF methods, but full, robust alignment is still a frontier to be conquered.
 
 ## References
 
 - [Introduction | RLHF Book by Nathan Lambert](https://rlhfbook.com/c/01-introduction.html), accessed April 12, 2025.
-- [Reinforcement learning from human feedback — Wikipedia](https://en.wikipedia.org/wiki/Reinforcement_learning_from_human_feedback), accessed April 13, 2025.
+- [Reinforcement learning from human feedback - Wikipedia](https://en.wikipedia.org/wiki/Reinforcement_learning_from_human_feedback), accessed April 13, 2025.
 - [Towards Reliable Alignment: Uncertainty-aware RLHF](https://arxiv.org/html/2410.23726v1), accessed April 14, 2025.
 - [A Comprehensive Survey of LLM Alignment Techniques: RLHF, RLAIF, PPO, DPO and More](https://arxiv.org/pdf/2407.16216), accessed April 12, 2025.
 - [New Reward Model Helps Improve LLM Alignment with Human Preferences](https://developer.nvidia.com/blog/new-reward-model-helps-improve-llm-alignment-with-human-preferences/), accessed April 13, 2025.

@@ -10,7 +10,13 @@ gsap.registerPlugin(useGSAP);
 // ── Configuration ──────────────────────────────────────────
 const CARD_W = 580;
 const CARD_H = 380;
-const PERSPECTIVE = 1600;
+// A long-lens camera and compound tilt reproduce the compressed, elevated
+// side view of the reference while keeping the cards readable as flat planes.
+const PERSPECTIVE = 3200;
+const PERSPECTIVE_ORIGIN = '50% 50%';
+const BASE_ROT_X = -24;
+const BASE_ROT_Y = -32;
+const BASE_ROT_Z = 13;
 const DEG = 180 / Math.PI;
 
 // Card-draw hover: every non-front card slides right; the one visible card
@@ -21,12 +27,28 @@ const DRAW_LIFT = 10;     // px upward
 const DRAW_SCALE = 0.015;
 const FRONT_DRAW_Z = 32;
 const FRONT_DRAW_SCALE = 0.01;
+const FRONT_STATE_DURATION = 0.36;
+
+// Seven projects can share the stage at once, while the outermost card still
+// disappears exactly at the wrap seam so recycling never becomes visible.
+const FADE_START = 2.5;
+const FADE_END = 3.5;
+const FRONT_COMPRESSION_START = -1.5;
+const FRONT_SPACING = 0.65;
 
 const getCardOpacity = (offset) => {
-  let opacity = 1;
-  if (offset > 2.5) opacity = 1 - (offset - 2.5) * 1.5;
-  if (offset < -1.5) opacity = 1 - Math.abs(offset + 1.5) * 2;
-  return Math.max(0, opacity);
+  const distance = Math.abs(offset);
+  if (distance <= FADE_START) return 1;
+  const fadeProgress = Math.min(
+    1,
+    (distance - FADE_START) / (FADE_END - FADE_START)
+  );
+
+  // The outgoing back card holds longer; the recycled front card returns
+  // cautiously. Both still reach zero at the seam, so wrapping stays hidden.
+  return offset > 0
+    ? 1 - fadeProgress ** 2
+    : (1 - fadeProgress) ** 3;
 };
 
 export default function Overview3D() {
@@ -44,6 +66,10 @@ export default function Overview3D() {
   // so hover is folded into the layout math instead of tweening the element
   // directly (which the loop would overwrite each frame).
   const hoverAmts = useRef(projects.map(() => ({ v: 0 })));
+  // Front-card ownership also needs an animated factor. A boolean switch would
+  // jump a hovered card 240px the instant scrolling changes its stack rank.
+  const frontAmts = useRef(projects.map(() => ({ v: 0 })));
+  const frontIndexRef = useRef(null);
 
   // Position all cards based on the current virtual scroll offset
   const layoutCards = useCallback(() => {
@@ -77,15 +103,39 @@ export default function Overview3D() {
       return closestIndex;
     }, -1);
 
+    const previousFrontIndex = frontIndexRef.current;
+    if (previousFrontIndex === null) {
+      frontAmts.current.forEach((amt, i) => {
+        amt.v = i === frontIndex ? 1 : 0;
+      });
+      frontIndexRef.current = frontIndex;
+    } else if (frontIndex !== previousFrontIndex) {
+      const previousAmt = frontAmts.current[previousFrontIndex];
+      const nextAmt = frontAmts.current[frontIndex];
+
+      if (previousAmt) {
+        gsap.killTweensOf(previousAmt);
+        gsap.to(previousAmt, {
+          v: 0,
+          duration: FRONT_STATE_DURATION,
+          ease: 'power2.inOut',
+        });
+      }
+      if (nextAmt) {
+        gsap.killTweensOf(nextAmt);
+        gsap.to(nextAmt, {
+          v: 1,
+          duration: FRONT_STATE_DURATION,
+          ease: 'power2.inOut',
+        });
+      }
+      frontIndexRef.current = frontIndex;
+    }
+
     cards.forEach((card, i) => {
       if (!card) return;
       const draw = card.querySelector('.tunnel-card-draw');
       if (!draw) return;
-
-      // Base rotation — elevated bird's eye, cards upright
-      const baseRotX = 8;
-      const baseRotY = -38;
-      const baseRotZ = -2;
 
       // The core math: the physical index minus the midpoint, shifted by the scroll amount.
       // When scrollPos increases (scrolling down), 'offset' becomes more negative
@@ -95,9 +145,15 @@ export default function Overview3D() {
       // -negative offset = close to camera (Z is positive)
       // +positive offset = deep in background (Z is negative)
 
-      const zShift = offset * -280 * spacingScale;
-      const xShift = offset * 180 * spacingScale;
-      const yShift = offset * -55 * spacingScale;
+      // Compress the near-camera end of the rail so leading cards retain their
+      // spacing without growing or reaching the viewport edge too quickly.
+      const positionOffset = offset < FRONT_COMPRESSION_START
+        ? FRONT_COMPRESSION_START
+          + (offset - FRONT_COMPRESSION_START) * FRONT_SPACING
+        : offset;
+      const zShift = positionOffset * -280 * spacingScale;
+      const xShift = positionOffset * 180 * spacingScale;
+      const yShift = positionOffset * -55 * spacingScale;
 
       // PERSPECTIVE-SHEAR COMPENSATION:
       // Every card shares the same base rotation, but perspective projects
@@ -114,12 +170,12 @@ export default function Overview3D() {
       const opacity = getCardOpacity(offset);
 
       const hover = hoverAmts.current[i]?.v ?? 0;
-      const isFront = i === frontIndex;
+      const front = frontAmts.current[i]?.v ?? 0;
 
       gsap.set(card, {
-        rotationX: baseRotX + compX,
-        rotationY: baseRotY - compY,
-        rotationZ: baseRotZ,
+        rotationX: BASE_ROT_X + compX,
+        rotationY: BASE_ROT_Y - compY,
+        rotationZ: BASE_ROT_Z,
         z: zShift,
         x: xShift,
         y: yShift,
@@ -133,11 +189,13 @@ export default function Overview3D() {
 
       // The outer card remains a stable hover target while the visible face
       // and its callout draw out together in the card's local 3D plane.
+      const drawZ = DRAW_Z + (FRONT_DRAW_Z - DRAW_Z) * front;
+      const drawScale = DRAW_SCALE + (FRONT_DRAW_SCALE - DRAW_SCALE) * front;
       gsap.set(draw, {
-        z: hover * (isFront ? FRONT_DRAW_Z : DRAW_Z),
-        x: isFront ? 0 : hover * DRAW_X * cardScale,
-        y: isFront ? 0 : -hover * DRAW_LIFT,
-        scale: 1 + hover * (isFront ? FRONT_DRAW_SCALE : DRAW_SCALE),
+        z: hover * drawZ,
+        x: hover * (1 - front) * DRAW_X * cardScale,
+        y: -hover * (1 - front) * DRAW_LIFT,
+        scale: 1 + hover * drawScale,
       });
     });
   }, []);
@@ -214,6 +272,7 @@ export default function Overview3D() {
         container.removeEventListener('touchcancel', handleTouchEnd);
       }
       if (rafId.current) cancelAnimationFrame(rafId.current);
+      gsap.killTweensOf(frontAmts.current);
     };
   }, { scope: containerRef });
 
@@ -272,7 +331,7 @@ export default function Overview3D() {
     <div
       ref={containerRef}
       className="w-full h-full flex items-center justify-center overflow-hidden cursor-default md:cursor-ns-resize touch-none"
-      style={{ perspective: `${PERSPECTIVE}px`, perspectiveOrigin: '50% 15%' }}
+      style={{ perspective: `${PERSPECTIVE}px`, perspectiveOrigin: PERSPECTIVE_ORIGIN }}
     >
       <div
         ref={stackRef}

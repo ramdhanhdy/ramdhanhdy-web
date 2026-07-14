@@ -2,17 +2,17 @@
 title: "Understanding the Dummy Variable Trap"
 slug: understanding-the-dummy-variable-trap
 date: "2024-07-29"
-summary: Why encoding every category can create perfect multicollinearity—and how a reference category solves it.
+summary: Why encoding every category can create perfect multicollinearity, and how a reference category solves it.
 draft: false
 ---
 
-> Have you ever tried to include categories in your regression models and ended up with confusing results? You might have fallen into the dummy variable trap! Don’t worry—this article will help you understand and avoid this common pitfall.
+> Have you ever tried to include categories in your regression models and ended up with confusing results? You might have fallen into the dummy variable trap! Don’t worry. This article will help you understand and avoid this common pitfall.
 
 ![Three illustrated ice-cream flavors representing the dummy variable trap and the need for a reference category.](/dummy-variable-ice-cream.jpg)
 
 ## What Are Dummy Variables?
 
-Imagine you’re analyzing ice cream sales and want to include flavor in your model. Flavor is a categorical variable—it could be chocolate, vanilla, or strawberry. But how do we represent these flavors numerically? That’s where dummy variables come in.
+Imagine you’re analyzing ice cream sales and want to include flavor in your model. Flavor is a categorical variable, which could be chocolate, vanilla, or strawberry. But how do we represent these flavors numerically? That’s where dummy variables come in.
 
 Dummy variables are like on/off switches for each category:
 
@@ -22,7 +22,7 @@ Each row represents a single ice-cream flavor, with `1` indicating “yes” and
 
 ## What Is the Dummy Variable Trap?
 
-The dummy variable trap occurs when we include all dummy variables in our model along with a constant term—the intercept. This creates a problem called *perfect multicollinearity*.
+The dummy variable trap occurs when we include all dummy variables in our model along with a constant term, the intercept. This creates a problem called *perfect multicollinearity*.
 
 ![A visual joke reading “It’s a trap,” illustrating the dummy variable trap.](/dummy-variable-multicollinearity.jpg)
 
@@ -74,8 +74,8 @@ Sales = β₀ + β₁(Chocolate) + β₂(Vanilla) + ε
 Now:
 
 - *β₀* is the average sales for Strawberry.
-- *β₁* is how much more—or less—Chocolate sells than Strawberry.
-- *β₂* is how much more—or less—Vanilla sells than Strawberry.
+- *β₁* tells us how much more or less Chocolate sells than Strawberry.
+- *β₂* tells us how much more or less Vanilla sells than Strawberry.
 
 This way, each flavor’s effect is compared with the reference category, and there is no redundancy.
 
