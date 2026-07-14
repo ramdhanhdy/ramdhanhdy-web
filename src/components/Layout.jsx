@@ -40,16 +40,6 @@ export default function Layout() {
             Work
           </TransitionLink>
             <TransitionLink 
-              to="/about" 
-              className={`px-3 sm:px-4 py-2 rounded-full border text-xs sm:text-sm transition-colors duration-300 ${
-                isActive('/about') 
-                  ? 'border-white text-white bg-white/5' 
-                  : 'border-zinc-800 text-white hover:bg-neon hover:text-black hover:border-neon'
-              }`}
-            >
-              About
-            </TransitionLink>
-            <TransitionLink 
               to="/blog" 
               className={`px-3 sm:px-4 py-2 rounded-full border text-xs sm:text-sm transition-colors duration-300 ${
                 isActive('/blog') 
@@ -63,7 +53,17 @@ export default function Layout() {
         <div className="hidden lg:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-auto font-medium text-lg tracking-widest uppercase text-white/90 whitespace-nowrap">
           Ramdhan Hidayat
         </div>
-        <div className="flex pointer-events-auto relative z-10 shrink-0">
+        <div className="flex gap-1 sm:gap-4 pointer-events-auto relative z-10 shrink-0">
+          <TransitionLink
+            to="/about"
+            className={`px-3 sm:px-4 py-2 rounded-full border text-xs sm:text-sm transition-colors duration-300 ${
+              isActive('/about')
+                ? 'border-white text-white bg-white/5'
+                : 'border-zinc-800 text-white hover:bg-neon hover:text-black hover:border-neon'
+            }`}
+          >
+            About
+          </TransitionLink>
           <TransitionLink 
             to="/contact" 
             className={`px-3 sm:px-4 py-2 rounded-full border text-xs sm:text-sm transition-colors duration-300 ${

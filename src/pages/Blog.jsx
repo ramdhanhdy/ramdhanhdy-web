@@ -4,6 +4,9 @@ import { posts } from '../lib/content';
 import { curtainTransition } from '../lib/curtain';
 import Meta from '../components/Meta';
 
+const MotionList = motion.ul;
+const MotionListItem = motion.li;
+
 const containerVariants = {
   hidden: { opacity: 0 },
   show: {
@@ -41,14 +44,14 @@ export default function Blog() {
           WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 120px)'
         }}
       >
-        <motion.ul
+        <MotionList
           variants={containerVariants}
           initial="hidden"
           animate="show"
           className="flex flex-col gap-10 sm:gap-12 md:gap-16 max-w-[90vw] mx-auto"
         >
           {posts.map((post, index) => (
-            <motion.li key={post.slug} variants={itemVariants} className="group relative">
+            <MotionListItem key={post.slug} variants={itemVariants} className="group relative">
               <a
                 href={`/blog/${post.slug}`}
                 onClick={(e) => handleClick(e, post.slug)}
@@ -69,9 +72,9 @@ export default function Blog() {
               {index !== posts.length - 1 && (
                 <div className="w-full h-[1px] bg-white/10 mt-10 sm:mt-12 md:mt-16 group-hover:bg-neon/30 transition-colors duration-500" />
               )}
-            </motion.li>
+            </MotionListItem>
           ))}
-        </motion.ul>
+        </MotionList>
       </div>
     </div>
   );

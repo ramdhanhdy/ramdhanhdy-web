@@ -1,13 +1,21 @@
-import { useMemo, useRef, lazy, Suspense } from 'react';
+import { createElement, useRef, lazy, Suspense } from 'react';
 import { useParams } from 'react-router-dom';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
-import { getProject, getAdjacentProjects } from '../lib/content';
+import { getProject, getAdjacentProjects, projects } from '../lib/content';
 import TransitionLink from '../components/TransitionLink';
 import Meta from '../components/Meta';
 import NotFound from './NotFound';
 
 gsap.registerPlugin(useGSAP);
+
+const projectBodyComponents = new Map(
+  projects.map((project) => [project.slug, lazy(project.load)])
+);
+
+function ProjectBody({ slug }) {
+  return createElement(projectBodyComponents.get(slug));
+}
 
 export default function ProjectDetail() {
   const { slug } = useParams();
@@ -15,12 +23,6 @@ export default function ProjectDetail() {
 
   const project = getProject(slug);
   const { prev, next } = getAdjacentProjects(slug);
-
-  // Each MDX body is its own chunk, loaded only when this route is visited.
-  const Body = useMemo(
-    () => (project ? lazy(project.load) : null),
-    [project]
-  );
 
   useGSAP(
     () => {
@@ -92,11 +94,11 @@ export default function ProjectDetail() {
           </div>
 
           {/* Cover */}
-          <div className="detail-reveal w-full aspect-[3/2] rounded-lg sm:rounded-xl overflow-hidden border border-white/[0.08] mb-12 sm:mb-16">
+          <div className="detail-reveal w-full aspect-[3/2] rounded-lg sm:rounded-xl overflow-hidden border border-white/[0.08] bg-black mb-12 sm:mb-16">
             <img
               src={project.cover}
               alt={project.title}
-              className="w-full h-full object-cover"
+              className={`w-full h-full ${project.coverFit === 'contain' ? 'object-contain' : 'object-cover'}`}
               fetchPriority="high"
               decoding="async"
             />
@@ -105,7 +107,7 @@ export default function ProjectDetail() {
           {/* MDX body */}
           <div className="detail-reveal case-prose">
             <Suspense fallback={null}>
-              <Body />
+              <ProjectBody slug={project.slug} />
             </Suspense>
           </div>
 

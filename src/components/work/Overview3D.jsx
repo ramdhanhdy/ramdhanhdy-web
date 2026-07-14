@@ -379,7 +379,7 @@ export default function Overview3D() {
                   <img
                     src={project.image}
                     alt={project.title}
-                    className="object-cover w-full h-full"
+                    className={`${project.coverFit === 'contain' ? 'object-contain' : 'object-cover'} w-full h-full`}
                     loading="eager"
                     decoding="async"
                     width={CARD_W}

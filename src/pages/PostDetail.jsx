@@ -1,13 +1,21 @@
-import { useMemo, useRef, lazy, Suspense } from 'react';
+import { createElement, useRef, lazy, Suspense } from 'react';
 import { useParams } from 'react-router-dom';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
-import { getPost } from '../lib/content';
+import { getPost, posts } from '../lib/content';
 import TransitionLink from '../components/TransitionLink';
 import Meta from '../components/Meta';
 import NotFound from './NotFound';
 
 gsap.registerPlugin(useGSAP);
+
+const postBodyComponents = new Map(
+  posts.map((post) => [post.slug, lazy(post.load)])
+);
+
+function PostBody({ slug }) {
+  return createElement(postBodyComponents.get(slug));
+}
 
 function formatDate(dateStr) {
   return new Date(dateStr).toLocaleDateString('en-US', {
@@ -22,8 +30,6 @@ export default function PostDetail() {
   const containerRef = useRef(null);
 
   const post = getPost(slug);
-
-  const Body = useMemo(() => (post ? lazy(post.load) : null), [post]);
 
   useGSAP(
     () => {
@@ -71,7 +77,7 @@ export default function PostDetail() {
 
           <div className="detail-reveal case-prose">
             <Suspense fallback={null}>
-              <Body />
+              <PostBody slug={post.slug} />
             </Suspense>
           </div>
 
