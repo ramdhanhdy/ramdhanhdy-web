@@ -189,8 +189,9 @@ export default function About() {
                 <TextReveal key={paragraph}>{paragraph}</TextReveal>
               ))}
             </div>
+          </div>
 
-            <section className="stack-section mt-28 border-t border-zinc-800 pt-8 sm:mt-36 sm:pt-10">
+          <section className="stack-section mt-28 border-t border-zinc-800 pt-8 sm:mt-36 sm:pt-10">
               <div className="stack-reveal grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(18rem,28rem)] md:items-end">
                 <div>
                   <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-zinc-500 sm:text-xs">
@@ -233,8 +234,7 @@ export default function About() {
                   </div>
                 ))}
               </div>
-            </section>
-          </div>
+          </section>
         </div>
       </div>
 
