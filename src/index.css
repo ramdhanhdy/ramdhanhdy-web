@@ -77,3 +77,27 @@
 .case-prose strong {
   @apply text-white font-semibold;
 }
+
+@media (max-width: 639px) {
+  .case-prose {
+    @apply text-base leading-relaxed;
+  }
+  .case-prose h2 {
+    @apply text-2xl mt-12 mb-5;
+  }
+  .case-prose h3 {
+    @apply text-xl mt-8 mb-3;
+  }
+  .case-prose blockquote {
+    @apply pl-4 my-6;
+  }
+  .case-prose code {
+    @apply text-sm;
+  }
+  .case-prose pre {
+    @apply p-4 my-6 rounded-lg;
+  }
+  .case-prose img {
+    @apply rounded-lg my-6;
+  }
+}

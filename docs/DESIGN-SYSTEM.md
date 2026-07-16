@@ -51,7 +51,8 @@ is.
 | Section heading (prose) | `text-3xl md:text-4xl font-semibold tracking-tight` | `.case-prose h2` |
 | Card title | `text-xl font-semibold` | Overview3D overlay |
 | Meta label | `text-xs uppercase tracking-widest` | Mono, zinc-600 |
-| Callout label | `text-[10px] uppercase tracking-[0.25em]` | Mono, neon |
+| Callout title | `text-[11px] font-semibold tracking-[0.06em]` | Mono, white |
+| Callout meta | `text-[9px] uppercase tracking-[0.2em]` | Mono, neon |
 
 ### Rules
 
@@ -66,12 +67,26 @@ is.
 
 ## Spacing & layout
 
-- Page frame: `h-screen overflow-hidden` (never document scroll).
+- Page frame: `h-screen h-dvh overflow-hidden` (`h-screen` is the fallback;
+  `h-dvh` tracks mobile browser chrome). Never use document scroll.
 - Inner scroll container: `pt-32 pb-24 px-6 md:px-12` (Blog uses `pt-40`).
 - Content max-widths: `max-w-4xl` (About, ProjectDetail), `max-w-3xl`
   (PostDetail), `max-w-5xl` (IndexList), `max-w-[90vw]` (Blog list).
 - Header: `px-8 py-4`, `fixed top-0 z-40`.
 - Scroll-mask gradient: `transparent 0% → black 120px` (matches header height).
+
+### Responsive rules
+
+- At mobile widths, the centered full-name header mark is hidden; the logo and
+  four navigation pills remain visible in one compact row.
+- Header padding becomes `px-3 py-3`, pills use `text-xs px-3`, and desktop
+  sizing returns from `sm` upward. Verify the complete row at 320px.
+- Mobile scrollable pages start at `pt-28`; desktop retains `pt-32` (Blog keeps
+  its larger `sm:pt-40` rhythm).
+- Display headings step down one size below `sm`, preserve tight leading, and
+  use `break-words` for long project/article titles.
+- Contact uses the inner-scroll pattern so short landscape viewports cannot
+  clip its links.
 
 ## Component conventions
 
@@ -86,9 +101,12 @@ Inactive: `border-zinc-800 text-white hover:bg-neon hover:text-black hover:borde
 
 ### Cards (Overview3D)
 
-- Fixed pixel size: 580×380 (`CARD_W`, `CARD_H`).
+- Design coordinate size: 580×380 (`CARD_W`, `CARD_H`). The rAF loop scales the
+  rendered card and deck spacing below 1100px; do not replace it with CSS zoom.
 - `rounded-xl overflow-hidden border border-white/[0.08] shadow-2xl`.
 - Depth overlay: `bg-black/30` at rest, `group-hover:bg-black/10` on hover.
+- Image cards add a permanent bottom gradient so the title remains readable on
+  bright cover art.
 - `translateZ(0)` on the inner face (Chrome border-radius fix — keep it).
 
 ### Prose (MDX body)
@@ -113,8 +131,8 @@ img/hr/strong. **Do not style MDX output with component-level CSS;** extend
 | Entrance (general) | `power3.out` | 0.8–0.9s |
 | Entrance stagger | — | 0.08–0.1s per item |
 | Curtain wipe | `power3.inOut` | 0.6s each direction |
-| Disc-throw hover in | `back.out(2.4)` | 0.55s |
-| Disc-throw hover out | `power3.out` | 0.5s |
+| Card-draw hover in | `power3.out` | 0.45s |
+| Card-draw hover out | `power3.out` | 0.4s |
 | Callout path draw | `power2.inOut` | 0.4s |
 | Callout marker pop | `back.out(3)` | 0.25s |
 | CSS hover transitions | `transition-colors duration-300` | 0.3s |
@@ -123,6 +141,10 @@ img/hr/strong. **Do not style MDX output with component-level CSS;** extend
 **Vibe:** fast, confident, with a touch of overshoot on kinetic interactions.
 Nothing should feel mushy or slow. Nothing should feel bouncy/childish either
 — `back.out` is used sparingly for the "thrown" feel, not everywhere.
+
+For Overview3D, non-front cards draw to the right. The single camera-nearest
+visible card must keep its x/y position and respond only with subtle depth and
+scale.
 
 ## CSS architecture
 

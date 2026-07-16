@@ -120,7 +120,7 @@ HTML comments cause a build error in MDX.
      }, { scope: containerRef });
 
      return (
-       <div ref={containerRef} className="w-full h-screen overflow-hidden bg-black">
+       <div ref={containerRef} className="w-full h-screen h-dvh overflow-hidden bg-black">
          <Meta title="New Page" description="Page description." />
          <div
            className="w-full h-full overflow-y-auto no-scrollbar pt-32 pb-24 px-6 md:px-12"
@@ -248,29 +248,32 @@ HTML comments cause a build error in MDX.
 
 **Read ANIMATIONS.md §3 in full before touching `Overview3D.jsx`.**
 
-### Tuning the disc-throw hover
+### Tuning the card-draw hover
 
 All hover physics constants are at the top of the file:
 
 ```js
-const THROW_Z = 240;      // px toward camera
-const THROW_LIFT = 18;    // px upward
-const THROW_YAW = 26;     // deg toward face-on
-const THROW_PITCH = 6;    // deg toward face-on
-const THROW_SPIN = 3;     // deg of disc-spin kick
+const DRAW_X = 240;       // px to the right for non-front cards
+const DRAW_Z = 56;        // subtle lift toward the viewer
+const DRAW_LIFT = 10;     // px upward
+const DRAW_SCALE = 0.015;
+const FRONT_DRAW_Z = 32;  // camera-nearest visible card: depth only
+const FRONT_DRAW_SCALE = 0.01;
 ```
 
 And the easing in `handleCardEnter`:
 
 ```js
-gsap.to(amt, { v: 1, duration: 0.55, ease: 'back.out(2.4)' });
+gsap.to(amt, { v: 1, duration: 0.45, ease: 'power3.out' });
 ```
 
-- More violent throw: increase `THROW_Z` and `THROW_YAW`.
-- More wobble: increase the `back.out` value (e.g., `back.out(3.5)`).
+- More rightward separation from the deck: increase `DRAW_X`.
+- More depth emphasis: increase `DRAW_Z` or `DRAW_SCALE` sparingly.
+- Tune the front card independently with `FRONT_DRAW_Z` and
+  `FRONT_DRAW_SCALE`; do not add x/y movement to it.
 - Faster/slower: adjust `duration`.
-- Gentler return: change `handleCardLeave` to `power2.out` or reduce
-  duration.
+- Gentler return: change `handleCardLeave` to `power2.out` or increase its
+  duration slightly.
 
 ### Tuning the carousel layout
 
@@ -286,6 +289,18 @@ const yShift = offset * -55;    // vertical rise
 - Deeper stack: increase `zShift` multiplier.
 - The perspective-shear compensation (`compY`, `compX`) derives from these
   values automatically — no separate tuning needed.
+
+### Responsive carousel scale
+
+`layoutCards` derives `cardScale` from `containerRef.current.clientWidth`:
+
+- Below 640px, the card fits inside a 48px viewport gutter and is clamped to
+  `0.44–0.62`.
+- From 640–1100px, scale interpolates from `0.68` to `1`.
+- `spacingScale` reduces x/y/z deck spacing with the card scale.
+
+Keep this calculation inside the rAF-owned layout. Do not add a CSS transform
+to `.tunnel-card`, because it will conflict with the transform owner.
 
 ### Tuning the callout
 

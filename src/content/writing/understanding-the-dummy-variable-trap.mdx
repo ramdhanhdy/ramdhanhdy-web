@@ -1,0 +1,90 @@
+---
+title: "Understanding the Dummy Variable Trap"
+slug: understanding-the-dummy-variable-trap
+date: "2024-07-29"
+summary: Why encoding every category can create perfect multicollinearity, and how a reference category solves it.
+draft: false
+---
+
+> Have you ever tried to include categories in your regression models and ended up with confusing results? You might have fallen into the dummy variable trap! Don’t worry. This article will help you understand and avoid this common pitfall.
+
+![Three illustrated ice-cream flavors representing the dummy variable trap and the need for a reference category.](/dummy-variable-ice-cream.jpg)
+
+## What Are Dummy Variables?
+
+Imagine you’re analyzing ice cream sales and want to include flavor in your model. Flavor is a categorical variable, which could be chocolate, vanilla, or strawberry. But how do we represent these flavors numerically? That’s where dummy variables come in.
+
+Dummy variables are like on/off switches for each category:
+
+![A one-hot encoding table for chocolate, vanilla, and strawberry ice-cream flavors.](/dummy-variable-encoding-table.png)
+
+Each row represents a single ice-cream flavor, with `1` indicating “yes” and `0` indicating “no.”
+
+## What Is the Dummy Variable Trap?
+
+The dummy variable trap occurs when we include all dummy variables in our model along with a constant term, the intercept. This creates a problem called *perfect multicollinearity*.
+
+![A visual joke reading “It’s a trap,” illustrating the dummy variable trap.](/dummy-variable-multicollinearity.jpg)
+
+## Why Is Perfect Multicollinearity a Problem?
+
+Perfect multicollinearity means that our variables are perfectly related. In our ice-cream example:
+
+```text
+Chocolate + Vanilla + Strawberry = 1 (always!)
+```
+
+This is because if an ice cream isn’t chocolate or vanilla, it must be strawberry. Our model gets confused when trying to determine the unique effect of each flavor because the variables are tied together in this way.
+
+## Mathematical Explanation
+
+Let’s look at a simple regression equation to understand this better:
+
+```text
+Sales = β₀ + β₁(Chocolate) + β₂(Vanilla) + β₃(Strawberry) + ε
+```
+
+Here:
+
+- *β₀* (beta-zero) is the average sales when all flavors are `0`, which is impossible in our case.
+- *β₁*, *β₂*, and *β₃* tell us how much each flavor affects sales compared with having no flavor at all.
+
+Because Chocolate + Vanilla + Strawberry always equals `1`, we can express Strawberry as:
+
+```text
+Strawberry = 1 − Chocolate − Vanilla
+```
+
+Substituting this back into our equation gives us:
+
+```text
+Sales = β₀ + β₁(Chocolate) + β₂(Vanilla) + β₃(1 − Chocolate − Vanilla) + ε
+```
+
+After simplifying, we can see that Strawberry’s effect is completely determined by the other flavors and the intercept. This makes it impossible for our model to estimate a unique effect for Strawberry.
+
+## How to Avoid the Trap
+
+The solution is simple: **leave one category out.** This becomes our reference category. For the ice-cream example, let’s use Strawberry as the reference:
+
+```text
+Sales = β₀ + β₁(Chocolate) + β₂(Vanilla) + ε
+```
+
+Now:
+
+- *β₀* is the average sales for Strawberry.
+- *β₁* tells us how much more or less Chocolate sells than Strawberry.
+- *β₂* tells us how much more or less Vanilla sells than Strawberry.
+
+This way, each flavor’s effect is compared with the reference category, and there is no redundancy.
+
+## Practice Problem
+
+> A restaurant wants to analyze whether the day of the week affects sales. It has data for Monday through Sunday. **How many dummy variables should it use in its model to avoid the dummy variable trap?**
+
+*Hint: Think about how many days are in a week and how many variables you need to represent them all uniquely.*
+
+---
+
+*Originally published on [Medium](https://medium.com/@ramdhanhdy/understanding-the-dummy-variable-trap-78d00f8bf20a).*

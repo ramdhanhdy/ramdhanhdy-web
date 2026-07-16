@@ -27,8 +27,8 @@ polish is a regression.
 2. **Never remove or rename `#global-curtain`** (in `src/components/Layout.jsx`).
    The entire transition system finds it by that exact DOM id.
 
-3. **Pages do not use document scroll.** Every page is `h-screen overflow-hidden`
-   with an inner scrollable div. Do not add content that relies on `<body>`
+3. **Pages do not use document scroll.** Every page is `h-screen h-dvh
+   overflow-hidden` with an inner scrollable div. Do not add content that relies on `<body>`
    scrolling. See "Scroll-mask pattern" in docs/ANIMATIONS.md.
 
 4. **The Overview3D rAF loop owns all card transforms.** Never tween a
@@ -54,8 +54,8 @@ After ANY change, verify the features nearby. Full context for each item is in
 - [ ] **Curtain transition** — click any nav pill: neon curtain wipes up, page
       swaps while covered, curtain exits upward. No flash of unstyled/blank page.
 - [ ] **Work / Overview (`/`)** — 3D card stack renders; mouse wheel cycles cards
-      infinitely; hovering a card "throws" it toward the viewer and shows the
-      angular callout label; clicking navigates to the case study.
+      infinitely; non-front cards draw right on hover, the single front card
+      stays centered, and the title/category callout appears; clicking navigates.
 - [ ] **Work / Index (`/?view=index`)** — rows stagger in; hovering a row shows
       a floating image preview that follows the cursor; row hover turns neon;
       clicking navigates.
@@ -67,6 +67,8 @@ After ANY change, verify the features nearby. Full context for each item is in
       MDX; prev/next (work) navigation works; unknown slug shows the 404.
 - [ ] **Scroll masks** — on every scrollable page, content fades out under the
       header instead of clipping hard.
+- [ ] **Mobile (320–390px)** — header links fit without overlap; carousel cards
+      fit the viewport and swipe vertically; no route has horizontal overflow.
 - [ ] **Build passes** — `npm run build` (fast, run it every time).
 
 ## Commands

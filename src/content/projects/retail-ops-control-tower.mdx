@@ -15,22 +15,22 @@ A fictional 100-store Indonesian coffee chain ("Kopi Senja") runs three seasonal
 limited-time-offer campaigns simultaneously. During each campaign, things go
 wrong: stores receive wrong quantities, confirmations go missing, photo proofs
 are never uploaded, setups happen late. These operational exceptions pile up
-fast — 1,603 of them across three campaigns — and nobody can tell which ones
-matter, who should fix them, or whether the fixes actually worked.
+fast. Across three campaigns, the total reaches 1,603, yet nobody can tell which
+ones matter, who should fix them, or whether the fixes actually worked.
 
 ## Approach
 
 The system layers four analytical stages:
 
-1. **Detection** — 9 exception rules across allocation, dispatch, confirmation,
+1. **Detection**: 9 exception rules across allocation, dispatch, confirmation,
    photo proof, and sales data. Each exception is tagged with severity, SLA
    window, and business impact.
-2. **Ranking** — A priority score formula (severity weight × 100 + age pressure
+2. **Ranking**: A priority score formula (severity weight × 100 + age pressure
    + business impact + campaign urgency) produces a daily action list.
-3. **Diagnosis** — A 4-layer statistical insight engine: Pareto/Gini
+3. **Diagnosis**: A 4-layer statistical insight engine: Pareto/Gini
    concentration, ANOVA/Kruskal-Wallis group comparisons, binomial/permutation
    tests, and rebalancing/financial modeling.
-4. **Verification** — Matched comparison between stores that received
+4. **Verification**: Matched comparison between stores that received
    intervention and statistically similar stores that didn't. The intervention
    effect is injected into simulated data with realistic noise (8% failures,
    5% assignment errors, 5% reopen), and the methodology must recover it.
@@ -39,7 +39,7 @@ The system layers four analytical stages:
 
 - 1,603 exceptions detected across 100 stores and 3 campaigns
 - 367 tests passing (unit, integration, methodology validation)
-- Gini coefficient of 0.459 — exceptions concentrate in a subset of stores
+- Gini coefficient of 0.459, with exceptions concentrated in a subset of stores
 - Intervention recovery: 60% resolve rate vs 34% control (26pp effect,
   statistically significant, injected effect was 30pp)
 - Dashboard cut from 514 lines to ~200, organized as question-named views
@@ -47,7 +47,7 @@ The system layers four analytical stages:
 ## Outcome
 
 The deliverable is a decision memo, not just a dashboard. The methodology
-survives noise — failures, reopens, and null results — rather than assuming
+survives noise such as failures, reopens, and null results, rather than assuming
 every intervention succeeds. The circularity (simulated effect, simulated
 recovery) is disclosed as a feature: the measurement approach is the product,
 not the finding.

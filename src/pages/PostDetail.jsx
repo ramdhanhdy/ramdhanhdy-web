@@ -1,13 +1,21 @@
-import { useMemo, useRef, lazy, Suspense } from 'react';
+import { createElement, useRef, lazy, Suspense } from 'react';
 import { useParams } from 'react-router-dom';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
-import { getPost } from '../lib/content';
+import { getPost, posts } from '../lib/content';
 import TransitionLink from '../components/TransitionLink';
 import Meta from '../components/Meta';
 import NotFound from './NotFound';
 
 gsap.registerPlugin(useGSAP);
+
+const postBodyComponents = new Map(
+  posts.map((post) => [post.slug, lazy(post.load)])
+);
+
+function PostBody({ slug }) {
+  return createElement(postBodyComponents.get(slug));
+}
 
 function formatDate(dateStr) {
   return new Date(dateStr).toLocaleDateString('en-US', {
@@ -22,8 +30,6 @@ export default function PostDetail() {
   const containerRef = useRef(null);
 
   const post = getPost(slug);
-
-  const Body = useMemo(() => (post ? lazy(post.load) : null), [post]);
 
   useGSAP(
     () => {
@@ -43,12 +49,12 @@ export default function PostDetail() {
   if (!post) return <NotFound />;
 
   return (
-    <div ref={containerRef} className="w-full h-screen overflow-hidden bg-black">
+    <div ref={containerRef} className="w-full h-screen h-dvh overflow-hidden bg-black">
       <Meta title={post.title} description={post.summary} type="article" />
 
       <div
         key={slug}
-        className="w-full h-full overflow-y-auto no-scrollbar pt-32 pb-24 px-6 md:px-12"
+        className="w-full h-full overflow-y-auto no-scrollbar pt-28 sm:pt-32 pb-20 sm:pb-24 px-5 sm:px-6 md:px-12"
         style={{
           maskImage: 'linear-gradient(to bottom, transparent 0%, black 120px)',
           WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 120px)',
@@ -59,7 +65,7 @@ export default function PostDetail() {
             <span className="font-mono text-sm text-neon/80">
               {formatDate(post.date)}
             </span>
-            <h1 className="text-4xl md:text-6xl font-semibold tracking-tighter text-white leading-[1.05]">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-semibold tracking-tighter text-white leading-[1.05] break-words">
               {post.title}
             </h1>
             {post.summary && (
@@ -71,7 +77,7 @@ export default function PostDetail() {
 
           <div className="detail-reveal case-prose">
             <Suspense fallback={null}>
-              <Body />
+              <PostBody slug={post.slug} />
             </Suspense>
           </div>
 

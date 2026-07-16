@@ -1,0 +1,101 @@
+---
+title: Customer Segmentation Beyond RFM
+slug: customer-segmentation-beyond-rfm
+category: Customer Analytics
+role: Data Science
+year: "2023"
+order: 7
+cover: /customer-segmentation-rfm-generation.png
+summary: Expanded a six-tier RFM model into eight actionable customer groups by combining purchase behavior, demographics, and campaign engagement.
+stack: [Python, pandas, UMAP, HDBSCAN, Optuna]
+---
+
+## Context
+
+RFM segmentation gave the marketing team a useful view of customer value, but
+not enough context to personalize a campaign. Two customers could share the
+same recency, frequency, and monetary profile while differing substantially in
+age, income, household structure, and response behavior.
+
+That limitation was visible in a dataset of 2,240 retail customers. The six RFM
+tiers identified large commercial groups such as 712 Champions and 598 Can't
+Lose customers. Yet their demographic composition varied in ways the labels did
+not explain. Generation and RFM tier were statistically related
+(`χ² = 101.49`, `p < 0.001`), but the small effect size (`Cramér's V = 0.11`)
+showed that RFM alone captured little of the demographic variation.
+
+The business question therefore changed from **"Who is valuable?"** to **"What
+kind of valuable customer is this, and how should we engage them?"**
+
+## Approach
+
+I developed the analysis in three stages:
+
+1. **Build a reliable customer view.** I audited missing values, duplicates,
+   invalid records, zero-variance fields, and extreme outliers. After removing
+   45 implausible observations, I engineered age, generation, household
+   structure, customer tenure, campaign engagement, total purchases, total
+   spending, spend per purchase, and RFM scores.
+2. **Select features for distinct business signals.** Pearson correlation and
+   Cramér's V exposed redundant inputs. I retained 11 mixed-type features that
+   balanced independence with commercial relevance: RFM tier, generation,
+   income band, campaign response, parent and widow status, recency score, age,
+   engagement rate, tenure, and spend per purchase.
+3. **Find stable groups in mixed data.** UMAP created a joint representation of
+   numerical and categorical behavior, then HDBSCAN identified dense customer
+   groups without requiring a preset number of clusters. A 300-trial Optuna
+   search tuned the density parameters against DBCV, a clustering-quality
+   metric designed for irregular cluster shapes.
+
+The selected model produced **eight clusters with 100% customer coverage and a
+DBCV score of 0.73**. That combination indicated well-separated groups without
+discarding customers as noise.
+
+![Eight customer groups identified through UMAP and HDBSCAN, with full coverage and a DBCV score of 0.73.](/customer-segmentation-clusters.png)
+
+## Evidence
+
+The new groups preserved the commercial signal from RFM while adding the
+demographic context required for differentiated messaging:
+
+- **High-value loyalists (35.0%)** split into two Champion groups: older Baby
+  Boomers with median age 66 and income of $62,000, and Generation X customers
+  with median age 49 and income of $62,882.
+- **Reactivation audiences (40.0%)** separated Can't Lose customers into an
+  older, higher-income group (median age 65; income $56,129) and a younger
+  Generation X group (median age 47; income $46,098).
+- **New-customer audiences (12.6%)** distinguished Baby Boomers from Generation
+  X customers, revealing different income and life-stage profiles behind the
+  same RFM label.
+- **Emerging value (5.8%)** isolated a lower-income Generation X group whose
+  dominant RFM profile was Promising rather than combining it with established
+  high-value customers.
+- **Younger champions (6.6%)** surfaced as a predominantly Millennial,
+  non-parent group with a median age of 36, a profile hidden inside the broader
+  Champion tier.
+
+Campaign behavior added a clear timing signal. Recent high spenders, defined as customers
+who had purchased within 14 days and spent between $1,253 and $2,525, showed a
+56% response rate. Among similarly high-spending customers whose last purchase
+was 19–39 days earlier, response fell to 42%; for customers inactive for 79–99
+days, the best-performing spend band reached only 18%.
+
+## Outcome
+
+The analysis turned six broad value tiers into eight addressable audiences and
+a more practical campaign framework:
+
+- Protect the two Champion groups with loyalty benefits and premium cross-sell,
+  while adapting creative to their different generations.
+- Treat the two Can't Lose groups as separate reactivation programs rather than
+  sending one generic win-back offer.
+- Give new customers cohort-specific onboarding and measure movement into
+  higher-value groups over time.
+- Prioritize recent high spenders when campaign responsiveness is strongest,
+  then change the offer or channel as recency declines.
+
+This project produced a targeting strategy, not a claim of incremental revenue.
+The source is a public customer-personality dataset, and customer lifetime value
+was not available. Before production use, the segment definitions should be
+tested for stability on newer data and their campaign recommendations validated
+through controlled experiments.

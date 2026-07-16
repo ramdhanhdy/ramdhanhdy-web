@@ -3,15 +3,15 @@ import TransitionLink from './TransitionLink';
 
 export default function HeaderHomeButton() {
   return (
-    <div className="pointer-events-auto mix-blend-difference mr-2">
+    <div className="pointer-events-auto mix-blend-difference sm:mr-2 shrink-0">
       <TransitionLink
         to="/?view=index"
-        className="group relative flex items-center justify-center w-10 h-10 outline-none cursor-pointer"
+        className="group relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 outline-none cursor-pointer"
         aria-label="Home"
       >
         <svg
           viewBox="0 0 200 200"
-          className="w-7 h-7 stroke-white group-hover:stroke-neon transition-colors duration-300"
+          className="w-6 h-6 sm:w-7 sm:h-7 stroke-white group-hover:stroke-neon transition-colors duration-300"
         >
           {/* Hexagon frame + geometric r — personal mark */}
           <path
