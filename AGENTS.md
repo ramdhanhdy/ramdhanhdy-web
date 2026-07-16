@@ -78,7 +78,10 @@ npm run dev      # dev server (usually :5173)
 npm run build    # ALWAYS run before considering a task done
 npm run lint     # eslint
 npm run preview  # serve dist/
+npm run test:e2e # Chromium browser smoke tests
+npm run verify   # lint, build, and browser smoke tests
 ```
 
-There is no test suite. The build + the do-not-break checklist above are the
-verification story. Verify visual changes in the browser, not by reading code.
+Browser smoke tests cover stable interaction end states, but do not replace the
+manual do-not-break checklist. Verify visual changes in the browser, not by
+reading code.

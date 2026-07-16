@@ -130,7 +130,7 @@ Check the effect of your changes on chunking by reading `npm run build` output.
 
 ## What does not exist (do not assume it does)
 
-- No test suite, no CI, no deployment config (not yet deployed).
+- Browser smoke tests live in `tests/e2e`; there is no CI or deployment config yet.
 - No dark/light theming — the site is permanently dark.
 - No i18n. English only.
 - No state management library. All state is component-local or in the URL.
