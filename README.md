@@ -1,7 +1,7 @@
 # ramdhanhdy-web
 
 Personal portfolio of Ramdhan Hidayat — data scientist, AI engineer, and
-designer-developer. This repository is both a portfolio and a portfolio piece:
+web developer. This repository is both a portfolio and a portfolio piece:
 it packages work in analytics and AI while demonstrating a distinct approach
 to web design, interaction, and frontend engineering.
 

@@ -7,7 +7,7 @@ import Meta from "../components/Meta";
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 const paragraphs = [
-  "I’m Ramdhan Hidayat, an Indonesia-based Data & AI Engineer and Creative Developer working at the intersection of intelligent systems, applied analytics, and expressive web design. I transform dense information and complex technology into precise, intuitive products built to earn trust, sharpen decisions, and leave a lasting visual impression.",
+  "I’m Ramdhan Hidayat, an Indonesia-based Data & AI Engineer and web developer working at the intersection of intelligent systems, applied analytics, and expressive web design. I transform dense information and complex technology into precise, intuitive products built to earn trust, sharpen decisions, and leave a lasting visual impression.",
   "I care about craft at every scale: the rigor of an evaluation framework, the architecture of an agent workflow, the weight of a typeface, and the timing of a transition. Every detail should strengthen the whole. Evidence, clarity, storytelling, and fluidity are the principles I return to because the best work feels both exact and effortless.",
   "Beyond the screen, I find perspective through strength training, hiking, and reading across science, technology, and human behavior. Each offers a different discipline: repetition, observation, and curiosity. Together, they keep me attentive to patterns, movement, and the quiet details that often spark the strongest ideas.",
 ];
@@ -160,7 +160,7 @@ export default function About() {
     >
       <Meta
         title="About"
-        description="Ramdhan Hidayat is an Indonesia-based Data & AI Engineer and Creative Developer creating intelligent systems, applied analytics, and expressive web experiences."
+        description="Ramdhan Hidayat is an Indonesia-based Data & AI Engineer and web developer creating intelligent systems, applied analytics, and expressive web experiences."
       />
       <div
         ref={scrollerRef}
