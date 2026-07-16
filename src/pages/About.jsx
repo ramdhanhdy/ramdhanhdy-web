@@ -7,9 +7,9 @@ import Meta from "../components/Meta";
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 const paragraphs = [
-  "I’m Ramdhan Hidayat, an Indonesia-based Data & AI Engineer and web developer working at the intersection of intelligent systems, applied analytics, and expressive web design. I transform dense information and complex technology into precise, intuitive products built to earn trust, sharpen decisions, and leave a lasting visual impression.",
-  "I care about craft at every scale: the rigor of an evaluation framework, the architecture of an agent workflow, the weight of a typeface, and the timing of a transition. Every detail should strengthen the whole. Evidence, clarity, storytelling, and fluidity are the principles I return to because the best work feels both exact and effortless.",
-  "Beyond the screen, I find perspective through strength training, hiking, and reading across science, technology, and human behavior. Each offers a different discipline: repetition, observation, and curiosity. Together, they keep me attentive to patterns, movement, and the quiet details that often spark the strongest ideas.",
+  "I'm Ramdhan Hidayat, a Data & AI Engineer and web developer based in Indonesia. My work revolves around building systems that sit between raw data and the people who rely on it. Whether I'm orchestrating multi-agent workflows, running LLM evaluations, or designing web interfaces, my focus is on making complex technology feel simple, reliable, and practical in the real world.",
+  "I care a lot about the quiet mechanics of a project. That means paying attention to how an evaluation framework catches the edge cases a demo hides, how a data pipeline holds up under load, and whether an interface actually feels intuitive. The goal is always to build tools that are direct, concrete, and stay completely out of the user's way.",
+  "Outside of work, I spend my time lifting at the gym, reading the latest AI papers to keep up with how fast the field is moving, and watching football. When I want to unwind, I enjoy strategy and managerial games like Football Manager to just take a step back and process things."
 ];
 
 const toolkit = [
@@ -202,8 +202,7 @@ export default function About() {
                   </h2>
                 </div>
                 <p className="max-w-md text-sm leading-relaxed text-zinc-500 sm:text-base md:justify-self-end">
-                  A focused set for moving from research and data to intelligent
-                  systems, expressive interfaces, and reliable delivery.
+                  The tools I reach for, depending on the problem.
                 </p>
               </div>
 
