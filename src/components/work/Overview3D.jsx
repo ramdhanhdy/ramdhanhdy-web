@@ -330,9 +330,19 @@ export default function Overview3D() {
   return (
     <div
       ref={containerRef}
-      className="w-full h-full flex items-center justify-center overflow-hidden cursor-default md:cursor-ns-resize touch-none"
+      className="relative w-full h-full flex items-center justify-center overflow-hidden cursor-default md:cursor-ns-resize touch-none"
       style={{ perspective: `${PERSPECTIVE}px`, perspectiveOrigin: PERSPECTIVE_ORIGIN }}
     >
+      {/* Botanical glow — the light theme's depth cue. Cards separate by
+          occluding this light; static on purpose (no vestibular motion). */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 pointer-events-none hidden light:block"
+        style={{
+          background:
+            'radial-gradient(42% 46% at 60% 46%, color-mix(in srgb, var(--color-neon) 12%, transparent), transparent 72%)',
+        }}
+      />
       <div
         ref={stackRef}
         className="relative"
@@ -365,7 +375,11 @@ export default function Overview3D() {
             >
               {/* Card face — clipping/rounding lives here so the callout can overflow the card */}
               <div
-                className="relative w-full h-full rounded-xl overflow-hidden border border-white/[0.08] shadow-2xl light:shadow-[0_24px_70px_-16px_rgba(28,27,23,0.22),0_2px_8px_rgba(28,27,23,0.05)]"
+                className={`relative w-full h-full rounded-xl overflow-hidden border border-white/[0.08] shadow-2xl light:shadow-[0_24px_70px_-16px_rgba(28,27,23,0.22),0_2px_8px_rgba(28,27,23,0.05)] ${
+                  project.image
+                    ? ''
+                    : 'transition-colors duration-500 light:group-hover:border-neon/40'
+                }`}
                 style={{ transform: 'translateZ(0)' /* Mitigate Chrome/Safari border-radius rendering bugs */ }}
               >
               {project.image ? (
@@ -400,19 +414,20 @@ export default function Overview3D() {
                   </div>
                 </>
               ) : (
-                /* Text-only card — typography is the hero, no image */
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-10 bg-zinc-950">
+                <>
+                {/* Text-only card — typography is the hero. A themed surface
+                    (not media): dark card in dark mode, white paper card in
+                    light so it never blends into the page. No veil —
+                    paper-on-paper would wash it out. */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-10 bg-zinc-950 light:bg-paper-card">
                   {/* Subtle dot-grid texture */}
                   <div
-                    className="absolute inset-0 opacity-[0.04]"
+                    className="absolute inset-0 opacity-[0.04] light:opacity-[0.07]"
                     style={{
                       backgroundImage: 'radial-gradient(circle, var(--dot-grid-color) 1px, transparent 1px)',
                       backgroundSize: '24px 24px',
                     }}
                   />
-                  {/* Depth overlay for consistency with image cards — this one
-                      is a themed surface (no image), so it follows the page */}
-                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors duration-500 z-10" />
 
                   {/* Neon diamond mark */}
                   <div className="relative z-20 w-2 h-2 rotate-45 bg-neon mb-2" />
@@ -437,6 +452,7 @@ export default function Overview3D() {
                     <span className="text-xs text-zinc-400 font-mono">{project.year}</span>
                   </div>
                 </div>
+                </>
               )}
               </div>
 

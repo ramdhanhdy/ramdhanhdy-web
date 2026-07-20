@@ -14,6 +14,9 @@
   --color-onmedia: #FFFFFF;
   --color-scrim: #000000;
   --color-neon-media: #C6FF00;
+  /* The light theme's typographic card surface: pure white paper that never
+     blends into the warm page. Never remapped — dark mode uses zinc-950. */
+  --color-paper-card: #FFFFFF;
   --font-sans: "Inter Variable", "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, "Cascadia Mono", monospace;
 }

@@ -189,9 +189,9 @@ export default function IndexList() {
             </div>
           </div>
         ) : activeProject ? (
-          <div className="w-full h-full flex flex-col items-center justify-center gap-2 p-4 bg-zinc-950 relative">
+          <div className="w-full h-full flex flex-col items-center justify-center gap-2 p-4 bg-zinc-950 light:bg-paper-card relative">
             <div
-              className="absolute inset-0 opacity-[0.04]"
+              className="absolute inset-0 opacity-[0.04] light:opacity-[0.07]"
               style={{
                 backgroundImage: 'radial-gradient(circle, var(--dot-grid-color) 1px, transparent 1px)',
                 backgroundSize: '18px 18px',

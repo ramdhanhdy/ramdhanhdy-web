@@ -105,9 +105,9 @@ export default function ProjectDetail() {
                 decoding="async"
               />
             ) : (
-              <div className="relative w-full h-full bg-zinc-950 flex flex-col items-center justify-center gap-5 p-10">
+              <div className="relative w-full h-full bg-zinc-950 light:bg-paper-card flex flex-col items-center justify-center gap-5 p-10">
                 <div
-                  className="absolute inset-0 opacity-[0.04]"
+                  className="absolute inset-0 opacity-[0.04] light:opacity-[0.07]"
                   style={{
                     backgroundImage: 'radial-gradient(circle, var(--dot-grid-color) 1px, transparent 1px)',
                     backgroundSize: '24px 24px',

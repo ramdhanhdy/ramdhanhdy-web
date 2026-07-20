@@ -44,8 +44,9 @@ Consequences of the remap (they are features — design with them):
   becomes deep-green with **paper** text in light mode automatically. Never
   write `light:hover:text-white` — `text-white` IS ink under the remap and
   would be dark-on-green.
-- `bg-black/30` overlays become white veils (frosted glass on the 3D deck);
-  `border-white/[0.08]` becomes an ink hairline.
+- `bg-black/30` overlays become white veils; `border-white/[0.08]` becomes
+  an ink hairline. (Image cards are exempt — their veils use the stable
+  `scrim` token, see the media rule below.)
 - `mix-blend-difference` only works on dark pages. In light mode the header,
   home button, and Work view-toggle switch to `light:mix-blend-normal` + the
   `glass` utility (translucent blur + bright top edge + soft shadow).
@@ -56,7 +57,17 @@ Consequences of the remap (they are features — design with them):
   `--color-neon-media` (#C6FF00) — never the remapped `white`/`black`/`neon`
   — for text, veils, gradients, and accents that sit on images. Text-only
   cards and cover-fallback panels are NOT media surfaces (no image): they
-  follow the page theme.
+  follow the page theme — and in light mode they use the stable
+  `--color-paper-card` (#FFF) surface, never `light:bg-white` (the remap
+  turns that into ink). White paper restores the surface logic the dark
+  theme gets from zinc-950-on-black; zinc-950 alone (#EEEDE6) is too close
+  to the page and blends. Text cards carry NO veil (paper-on-paper washes
+  out), a `light:opacity-[0.07]` dot grid, and a hover-reactive
+  `light:group-hover:border-neon/40` (interactive neon, not decoration).
+- The Overview3D stage adds a static botanical glow behind the stack in
+  light mode only (`hidden light:block`, radial `color-mix` of
+  `--color-neon` at 12%): cards separate by occluding the light. It must
+  never animate (vestibular) and never render in dark mode.
 - The `.glass` utility (`src/index.css`) is the ONLY glass recipe:
   `color-mix(white 58%)` + `blur(20px) saturate(180%)` + inner top highlight +
   `0 8px 24px` soft shadow. It degrades to solid white under
