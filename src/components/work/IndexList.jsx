@@ -181,11 +181,11 @@ export default function IndexList() {
               height="220"
               decoding="async"
             />
-            <div className="absolute inset-0 bg-neon mix-blend-overlay opacity-15 pointer-events-none" />
-            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-neon-media mix-blend-overlay opacity-15 pointer-events-none" />
+            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-scrim/80 to-transparent pointer-events-none" />
             <div className="absolute inset-x-4 bottom-3 flex items-end justify-between gap-4 font-mono text-[9px] uppercase tracking-[0.18em]">
-              <span className="text-white/80">{activeProject.category}</span>
-              <span className="text-neon">{activeProject.year}</span>
+              <span className="text-onmedia/80">{activeProject.category}</span>
+              <span className="text-neon-media">{activeProject.year}</span>
             </div>
           </div>
         ) : activeProject ? (

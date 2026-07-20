@@ -49,6 +49,14 @@ Consequences of the remap (they are features — design with them):
 - `mix-blend-difference` only works on dark pages. In light mode the header,
   home button, and Work view-toggle switch to `light:mix-blend-normal` + the
   `glass` utility (translucent blur + bright top edge + soft shadow).
+- **Media surfaces never invert.** Anything painted ON imagery (card veils,
+  title scrims, preview captions) stays in the dark scheme in both themes —
+  photos don't change with the page, so their overlays can't either. Use the
+  theme-stable tokens `--color-onmedia` (#fff), `--color-scrim` (#000), and
+  `--color-neon-media` (#C6FF00) — never the remapped `white`/`black`/`neon`
+  — for text, veils, gradients, and accents that sit on images. Text-only
+  cards and cover-fallback panels are NOT media surfaces (no image): they
+  follow the page theme.
 - The `.glass` utility (`src/index.css`) is the ONLY glass recipe:
   `color-mix(white 58%)` + `blur(20px) saturate(180%)` + inner top highlight +
   `0 8px 24px` soft shadow. It degrades to solid white under

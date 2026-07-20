@@ -370,10 +370,11 @@ export default function Overview3D() {
               >
               {project.image ? (
                 <>
-                  {/* Depth overlay — gets darker for deeper cards */}
-                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors duration-500 z-10 light:bg-black/15 light:group-hover:bg-black/5" />
+                  {/* Depth overlay — a media surface, so the scrim stays dark
+                      in both themes (images don't invert with the page) */}
+                  <div className="absolute inset-0 bg-scrim/30 group-hover:bg-scrim/10 transition-colors duration-500 z-10" />
                   {/* Permanent contrast behind titles on bright cover art */}
-                  <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/90 via-black/45 to-transparent z-10 pointer-events-none" />
+                  <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-scrim/90 via-scrim/45 to-transparent z-10 pointer-events-none" />
 
                   {/* Project image */}
                   <img
@@ -388,14 +389,14 @@ export default function Overview3D() {
 
                   {/* Bottom-left text overlay */}
                   <div className="absolute bottom-5 left-6 z-20 flex flex-col gap-1">
-                    <h2 className="text-xl font-semibold text-white drop-shadow-lg">
+                    <h2 className="text-xl font-semibold text-onmedia drop-shadow-lg">
                       {project.title}
                     </h2>
                   </div>
 
                   {/* Year badge */}
                   <div className="absolute bottom-5 right-6 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                    <span className="text-xs text-zinc-400 font-mono">{project.year}</span>
+                    <span className="text-xs text-onmedia/60 font-mono">{project.year}</span>
                   </div>
                 </>
               ) : (
@@ -409,8 +410,9 @@ export default function Overview3D() {
                       backgroundSize: '24px 24px',
                     }}
                   />
-                  {/* Depth overlay for consistency with image cards */}
-                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors duration-500 z-10 light:bg-black/15 light:group-hover:bg-black/5" />
+                  {/* Depth overlay for consistency with image cards — this one
+                      is a themed surface (no image), so it follows the page */}
+                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors duration-500 z-10" />
 
                   {/* Neon diamond mark */}
                   <div className="relative z-20 w-2 h-2 rotate-45 bg-neon mb-2" />

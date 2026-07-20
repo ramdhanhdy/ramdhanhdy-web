@@ -126,7 +126,9 @@ export default function PageName() {
 6. **No hardcoded colors** — token classes only (`bg-black`, `text-zinc-400`,
    `text-neon`…). The light theme remaps tokens; literals like `#fff` or
    `rgba(0,0,0,.5)` cannot follow. Themed exceptions go through CSS variables
-   defined per-theme in `index.css` (see `--dot-grid-color`).
+   defined per-theme in `index.css` (see `--dot-grid-color`). Overlays on
+   imagery use the theme-stable media tokens (`onmedia`, `scrim`,
+   `neon-media`) — see the media-surface rule in DESIGN-SYSTEM.md.
 
 ## CSS conventions
 

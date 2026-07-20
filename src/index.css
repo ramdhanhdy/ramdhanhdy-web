@@ -9,6 +9,11 @@
 @theme {
   --color-neon: #C6FF00;
   --color-neon-glow: #B8FF00;
+  /* Media surfaces (card/preview imagery) never invert with the theme —
+     overlays painted on images stay in the dark scheme in both themes. */
+  --color-onmedia: #FFFFFF;
+  --color-scrim: #000000;
+  --color-neon-media: #C6FF00;
   --font-sans: "Inter Variable", "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, "Cascadia Mono", monospace;
 }
