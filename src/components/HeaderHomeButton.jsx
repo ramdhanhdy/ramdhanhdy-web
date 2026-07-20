@@ -3,10 +3,10 @@ import TransitionLink from './TransitionLink';
 
 export default function HeaderHomeButton() {
   return (
-    <div className="pointer-events-auto mix-blend-difference sm:mr-2 shrink-0">
+    <div className="pointer-events-auto mix-blend-difference light:mix-blend-normal sm:mr-2 shrink-0">
       <TransitionLink
         to="/?view=index"
-        className="group relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 outline-none cursor-pointer"
+        className="group relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 outline-none cursor-pointer rounded-full light:glass light:border light:border-[rgba(28,27,23,0.08)]"
         aria-label="Home"
       >
         <svg

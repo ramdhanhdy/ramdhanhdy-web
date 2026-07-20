@@ -6,6 +6,56 @@ matter — hover states, the curtain, active callouts, the scrollbar, key
 typographic highlights. Restraint is the rule: if everything is neon, nothing
 is.
 
+The site also ships a **light theme** (liquid-glass, calm, warm paper) behind
+the header toggle. Dark remains the default identity; the light theme is an
+adaptation of the same language, not a second design system.
+
+## Theming architecture
+
+- Theme state is `data-theme="dark"|"light"` on `<html>`. An inline script in
+  `index.html` applies the stored preference **before first paint** (no FOUC);
+  `src/lib/theme.js` owns runtime flips (`applyTheme`,
+  `setThemeWithTransition`) and the `useTheme()` hook.
+- Tailwind v4 utilities reference `var(--color-*)`, so `html[data-theme="light"]`
+  in `src/index.css` **remaps the tokens** (black↔paper, white↔ink, inverted
+  zinc ramp, deepened neon) and every token-based class re-skins with zero
+  component changes. **This is why hardcoded colors are banned in components**
+  — a literal `#fff` or `rgba(0,0,0,…)` cannot be remapped.
+- Escape hatches that DO need literal values live as CSS variables in
+  `index.css` (`--dot-grid-color`, `--preview-shadow`, `--color-neon-glow`)
+  with per-theme values.
+- A `@custom-variant light` exists for layout-level exceptions
+  (`light:mix-blend-normal`, `light:glass`, light-only shadows). Use it
+  sparingly — token remap should do the work first.
+
+## Light palette (the remapped tokens)
+
+| Dark token | Light value | Role |
+|---|---|---|
+| `--color-neon` `#C6FF00` | `#4D7C0F` | Same accent, deepened for ≥4.5:1 text contrast on paper. Curtain, hovers, callouts |
+| `--color-black` `#000` | `#F5F4F0` | Warm paper background |
+| `--color-white` `#fff` | `#1C1B17` | Warm ink foreground |
+| zinc-300/400/500/600 | `#52525B` / `#6E6E77` / `#9B9BA3` / `#ABABB2` | Text ramp, inverted around mid-tones |
+| zinc-700/800/900/950 | `#CFCFC4` / `#DFDED6` / `#E6E5DD` / `#EEEDE6` | Hairlines, quiet surfaces, code blocks |
+
+Consequences of the remap (they are features — design with them):
+
+- The hover triplet (`hover:bg-neon hover:text-black hover:border-neon`)
+  becomes deep-green with **paper** text in light mode automatically. Never
+  write `light:hover:text-white` — `text-white` IS ink under the remap and
+  would be dark-on-green.
+- `bg-black/30` overlays become white veils (frosted glass on the 3D deck);
+  `border-white/[0.08]` becomes an ink hairline.
+- `mix-blend-difference` only works on dark pages. In light mode the header,
+  home button, and Work view-toggle switch to `light:mix-blend-normal` + the
+  `glass` utility (translucent blur + bright top edge + soft shadow).
+- The `.glass` utility (`src/index.css`) is the ONLY glass recipe:
+  `color-mix(white 58%)` + `blur(20px) saturate(180%)` + inner top highlight +
+  `0 8px 24px` soft shadow. It degrades to solid white under
+  `prefers-reduced-transparency`.
+- Page frames opt into the light ambient gradient (top light + faint green
+  depth) with the `.page-bg` marker class. Every page root must have it.
+
 ## Color
 
 | Token | Value | Usage |
@@ -23,7 +73,8 @@ is.
 ### Rules
 
 - **Never introduce a second accent color.** If you need visual hierarchy, use
-  opacity/zinc shades, not a new hue.
+  opacity/zinc shades, not a new hue. The light theme's `#4D7C0F` is the SAME
+  accent deepened for contrast — not a second accent.
 - **Neon is for interaction and emphasis, not decoration.** A static neon
   element that doesn't respond to user input dilutes the language.
 - **Hover pattern:** inactive → `border-zinc-800 text-white`; hover →
@@ -31,6 +82,9 @@ is.
   pill and every interactive border element. Copy it; don't invent variants.
 - `mix-blend-difference` on the header makes nav legible over any content.
   Don't remove it or add backgrounds to header children that cancel the blend.
+  In light mode the header switches to `light:mix-blend-normal` and the pills
+  carry `light:glass` — legibility there comes from the glass material, so
+  don't cancel THAT with opaque backgrounds either.
 
 ## Typography
 
@@ -79,8 +133,9 @@ is.
 
 - At mobile widths, the centered full-name header mark is hidden; the logo and
   four navigation pills remain visible in one compact row.
-- Header padding becomes `px-3 py-3`, pills use `text-xs px-3`, and desktop
-  sizing returns from `sm` upward. Verify the complete row at 320px.
+- Header padding becomes `px-3 py-3`, pills use `text-xs px-2.5` (px-3 was
+  tightened to fit the theme toggle), and desktop sizing returns from `sm`
+  upward. Verify the complete row — including the toggle — at 320px.
 - Mobile scrollable pages start at `pt-28`; desktop retains `pt-32` (Blog keeps
   its larger `sm:pt-40` rhythm).
 - Display headings step down one size below `sm`, preserve tight leading, and

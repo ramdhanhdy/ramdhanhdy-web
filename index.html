@@ -5,6 +5,18 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#000000" />
+    <script>
+      // Apply the stored theme before first paint so the page never flashes dark.
+      try {
+        var theme = localStorage.getItem('theme') === 'light' ? 'light' : 'dark';
+        document.documentElement.dataset.theme = theme;
+        document
+          .querySelector('meta[name="theme-color"]')
+          .setAttribute('content', theme === 'light' ? '#F5F4F0' : '#000000');
+      } catch (error) {
+        document.documentElement.dataset.theme = 'dark';
+      }
+    </script>
     <title>Ramdhan Hidayat — Data & AI Engineer</title>
     <meta
       name="description"

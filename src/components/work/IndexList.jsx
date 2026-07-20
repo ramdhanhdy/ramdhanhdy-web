@@ -169,7 +169,7 @@ export default function IndexList() {
       <div
         ref={imageRef}
         data-testid="project-preview"
-        className="pointer-events-none fixed left-0 top-0 z-30 hidden h-[220px] w-[330px] scale-75 overflow-hidden rounded-lg border border-white/15 bg-zinc-950 opacity-0 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.9)] md:block"
+        className="pointer-events-none fixed left-0 top-0 z-30 hidden h-[220px] w-[330px] scale-75 overflow-hidden rounded-lg border border-white/15 bg-zinc-950 opacity-0 shadow-[0_30px_80px_-20px_var(--preview-shadow)] md:block"
       >
         {activeProject?.image ? (
           <div className="relative h-full w-full">
@@ -193,7 +193,7 @@ export default function IndexList() {
             <div
               className="absolute inset-0 opacity-[0.04]"
               style={{
-                backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)',
+                backgroundImage: 'radial-gradient(circle, var(--dot-grid-color) 1px, transparent 1px)',
                 backgroundSize: '18px 18px',
               }}
             />

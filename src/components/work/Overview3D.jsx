@@ -365,13 +365,13 @@ export default function Overview3D() {
             >
               {/* Card face — clipping/rounding lives here so the callout can overflow the card */}
               <div
-                className="relative w-full h-full rounded-xl overflow-hidden border border-white/[0.08] shadow-2xl"
+                className="relative w-full h-full rounded-xl overflow-hidden border border-white/[0.08] shadow-2xl light:shadow-[0_24px_70px_-16px_rgba(28,27,23,0.22),0_2px_8px_rgba(28,27,23,0.05)]"
                 style={{ transform: 'translateZ(0)' /* Mitigate Chrome/Safari border-radius rendering bugs */ }}
               >
               {project.image ? (
                 <>
                   {/* Depth overlay — gets darker for deeper cards */}
-                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors duration-500 z-10" />
+                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors duration-500 z-10 light:bg-black/15 light:group-hover:bg-black/5" />
                   {/* Permanent contrast behind titles on bright cover art */}
                   <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/90 via-black/45 to-transparent z-10 pointer-events-none" />
 
@@ -405,12 +405,12 @@ export default function Overview3D() {
                   <div
                     className="absolute inset-0 opacity-[0.04]"
                     style={{
-                      backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)',
+                      backgroundImage: 'radial-gradient(circle, var(--dot-grid-color) 1px, transparent 1px)',
                       backgroundSize: '24px 24px',
                     }}
                   />
                   {/* Depth overlay for consistency with image cards */}
-                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors duration-500 z-10" />
+                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors duration-500 z-10 light:bg-black/15 light:group-hover:bg-black/5" />
 
                   {/* Neon diamond mark */}
                   <div className="relative z-20 w-2 h-2 rotate-45 bg-neon mb-2" />
@@ -454,9 +454,8 @@ export default function Overview3D() {
               >
                 {/* Bent-wire leader: vertical rise, 45° fold, horizontal run */}
                 <path
-                  className="callout-path"
+                  className="callout-path stroke-neon"
                   d="M8 84 L8 50 L40 18 L276 18"
-                  stroke="#C6FF00"
                   strokeWidth="1.5"
                   pathLength="1"
                   strokeDasharray="1"
@@ -464,17 +463,16 @@ export default function Overview3D() {
                 />
                 {/* Diamond anchor pinned to the card */}
                 <rect
-                  className="callout-marker"
+                  className="callout-marker fill-neon"
                   x="4"
                   y="80"
                   width="8"
                   height="8"
                   transform="rotate(45 8 84)"
-                  fill="#C6FF00"
                 />
               </svg>
               <div
-                className="callout-label absolute right-0 top-[18px] -translate-y-1/2 opacity-0 min-w-[218px] bg-black/90 backdrop-blur-sm border border-neon/50 px-3 py-2 font-mono whitespace-nowrap"
+                className="callout-label absolute right-0 top-[18px] -translate-y-1/2 opacity-0 min-w-[218px] bg-black/90 backdrop-blur-sm border border-neon/50 px-3 py-2 font-mono whitespace-nowrap light:shadow-[0_12px_32px_-8px_rgba(28,27,23,0.18)]"
               >
                 <span className="block text-[11px] font-semibold tracking-[0.06em] text-white">
                   {project.title}

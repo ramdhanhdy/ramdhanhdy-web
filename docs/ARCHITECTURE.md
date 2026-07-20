@@ -42,6 +42,7 @@ e:/ramdhanhdy-web
     │   ├── Layout.jsx          # Header nav + <Suspense><Outlet/></Suspense> + #global-curtain
     │   ├── TransitionLink.jsx  # <a> that navigates through the curtain
     │   ├── HeaderHomeButton.jsx# 4-pointed star logo (links to /?view=index)
+    │   ├── ThemeToggle.jsx     # Dark/light switch (header, right cluster)
     │   ├── Meta.jsx            # Per-page <title>/OG/Twitter tags (React 19 hoisting)
     │   └── work/               # Components used only by the Work page
     │       ├── Overview3D.jsx  # 3D card carousel (rAF-driven, most complex file)
@@ -51,7 +52,8 @@ e:/ramdhanhdy-web
     │   └── writing/*.mdx       # One file per blog post
     ├── lib/
     │   ├── content.js          # Content loader (glob imports, sorting, lookups)
-    │   └── curtain.js          # curtainTransition() — the shared page-wipe
+    │   ├── curtain.js          # curtainTransition() — the shared page-wipe
+    │   └── theme.js            # data-theme owner: applyTheme, useTheme, View-Transition reveal
     └── pages/                  # One component per route (all lazy)
         ├── Work.jsx            # / — toggles Overview3D vs IndexList via ?view=
         ├── ProjectDetail.jsx   # /work/:slug
@@ -128,10 +130,29 @@ Check the effect of your changes on chunking by reading `npm run build` output.
 - `public/robots.txt` allows everything. There is no sitemap yet (no production
   domain decided).
 
+## Theming
+
+Dark is the default identity; a light theme ships behind the header toggle.
+The mechanism (details in docs/DESIGN-SYSTEM.md):
+
+1. `index.html` has an inline script that reads `localStorage.theme` and sets
+   `data-theme` on `<html>` **before first paint** — no flash of the wrong
+   theme, and no React involvement (theme is a DOM concern, not state).
+2. Tailwind v4 utilities reference `var(--color-*)`; `html[data-theme="light"]`
+   in `src/index.css` remaps the color tokens, re-skinning every token-based
+   class at runtime. Components therefore never hardcode colors.
+3. `src/lib/theme.js` flips the attribute (persisted to localStorage, mirrored
+   into `<meta name="theme-color">`), animates the swap with a circular
+   `document.startViewTransition` reveal from the toggle (soft crossfade
+   fallback, instant under `prefers-reduced-motion`), and exposes `useTheme()`
+   for components whose JS needs the resolved palette (About's char color).
+4. `ThemeToggle.jsx` lives in the Layout header's right cluster.
+
 ## What does not exist (do not assume it does)
 
 - Browser smoke tests live in `tests/e2e`; there is no CI or deployment config yet.
-- No dark/light theming — the site is permanently dark.
+- No system-preference sniffing — theme defaults to dark unless the user
+  explicitly toggled (their choice is persisted).
 - No i18n. English only.
 - No state management library. All state is component-local or in the URL.
 - No API calls at runtime. Everything is static.

@@ -17,11 +17,11 @@ export default function Work() {
   };
 
   return (
-    <div className="w-full h-screen h-dvh overflow-hidden flex flex-col relative bg-black">
+    <div className="page-bg w-full h-screen h-dvh overflow-hidden flex flex-col relative bg-black">
       <Meta />
 
       {/* View Toggle */}
-      <div className="absolute bottom-5 right-4 sm:bottom-8 sm:right-8 z-40 flex gap-1 sm:gap-2 mix-blend-difference bg-zinc-900/50 p-1 rounded-full backdrop-blur-md">
+      <div className="absolute bottom-5 right-4 sm:bottom-8 sm:right-8 z-40 flex gap-1 sm:gap-2 mix-blend-difference light:mix-blend-normal bg-zinc-900/50 p-1 rounded-full backdrop-blur-md light:glass light:border light:border-[rgba(28,27,23,0.08)]">
         <button
           onClick={() => handleViewChange('overview')}
           className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-colors ${

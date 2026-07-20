@@ -2,7 +2,7 @@ import Meta from '../components/Meta';
 
 export default function Contact() {
   return (
-    <div className="w-full h-screen h-dvh overflow-hidden bg-black">
+    <div className="page-bg w-full h-screen h-dvh overflow-hidden bg-black">
       <Meta title="Contact" description="Get in touch with Ramdhan Hidayat." />
       <div
         className="w-full h-full overflow-y-auto no-scrollbar flex items-center px-6 sm:px-8 pt-28 pb-16"

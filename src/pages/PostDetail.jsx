@@ -49,7 +49,7 @@ export default function PostDetail() {
   if (!post) return <NotFound />;
 
   return (
-    <div ref={containerRef} className="w-full h-screen h-dvh overflow-hidden bg-black">
+    <div ref={containerRef} className="page-bg w-full h-screen h-dvh overflow-hidden bg-black">
       <Meta title={post.title} description={post.summary} type="article" />
 
       <div

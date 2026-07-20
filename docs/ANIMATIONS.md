@@ -280,8 +280,40 @@ the right image per row, no stuck hover after fast scrolling, clicks navigate.
 - The neon progress bar (right edge, hidden on mobile) is a `scaleY 0→1` scrub
   of `contentRef` scroll progress, `transform-origin: top`.
 
+**Theme invariant:** the lit color is NOT hardcoded — the char tween resolves
+`--color-white` from the active theme, in a dedicated `useGSAP` hook with
+`dependencies: [theme]`. This rebuilds only the char scrub on theme flips;
+the entrance/stack/progress animations must NOT replay. Never tween to a
+literal `'#ffffff'` — it would be invisible on the light theme's paper.
+
 **Verify:** characters light progressively while scrolling (already partially
-lit at top), progress bar reaches exactly full at the bottom.
+lit at top), progress bar reaches exactly full at the bottom. Toggle the
+theme mid-page: chars stay lit in the new theme's ink color without the
+entrance animations replaying.
+
+---
+
+## 5b. Theme toggle reveal (site-wide)
+
+**Files:** `src/lib/theme.js`, `src/components/ThemeToggle.jsx`, `src/index.css`
+
+- The toggle animates a **circular reveal from its own center**:
+  `document.startViewTransition(() => applyTheme(next))`, then a WAAPI
+  clip-path `circle(0 → viewport-radius)` on `::view-transition-new(root)`.
+  The old theme's snapshot holds still underneath (both root snapshots have
+  `animation: none` in index.css) — the new theme grows over it.
+- Fallbacks: no `startViewTransition` → `html.theme-fade` class for 500ms
+  (color-only CSS transitions, scoped to `body *`). `prefers-reduced-motion`
+  → instant swap, no reveal, no fade.
+- Icon: Sun/Moon crossfade with rotation (CSS transitions, killed under
+  reduced motion). Press feedback is `motion-safe:active:scale-90`.
+- GSAP-driven pages don't observe the attribute; only About subscribes via
+  `useTheme()` (see §5). Everything else re-skins through CSS variables.
+
+**Verify:** click the toggle — a circle of the new theme grows from the
+button and settles in ~0.65s with no flash of unstyled content; reload keeps
+the choice; `meta[name="theme-color"]` matches; reduced-motion emulation
+swaps instantly.
 
 ---
 

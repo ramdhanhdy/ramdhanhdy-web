@@ -120,7 +120,7 @@ HTML comments cause a build error in MDX.
      }, { scope: containerRef });
 
      return (
-       <div ref={containerRef} className="w-full h-screen h-dvh overflow-hidden bg-black">
+       <div ref={containerRef} className="page-bg w-full h-screen h-dvh overflow-hidden bg-black">
          <Meta title="New Page" description="Page description." />
          <div
            className="w-full h-full overflow-y-auto no-scrollbar pt-32 pb-24 px-6 md:px-12"

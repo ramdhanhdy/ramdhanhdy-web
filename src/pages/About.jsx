@@ -3,6 +3,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Meta from "../components/Meta";
+import { useTheme } from "../lib/theme";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -79,11 +80,11 @@ export default function About() {
   const textRef = useRef(null);
   const scrollerRef = useRef(null);
   const contentRef = useRef(null);
+  const theme = useTheme();
 
   useGSAP(
     () => {
       const scroller = scrollerRef.current;
-      const text = textRef.current;
 
       gsap.from(".about-reveal", {
         opacity: 0,
@@ -93,34 +94,6 @@ export default function About() {
         ease: "power3.out",
         delay: 0.15,
         clearProps: "all",
-      });
-
-      const initialTop =
-        text.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
-      const INITIAL_LIT_RATIO = 0.15;
-
-      gsap.to(".text-char", {
-        color: "#ffffff",
-        opacity: 1,
-        duration: 2,
-        stagger: 0.05,
-        scrollTrigger: {
-          trigger: text,
-          scroller,
-          start: () => {
-            const viewportHeight = scroller.offsetHeight;
-            const textHeight = text.offsetHeight;
-            const endPosition = 0.95 * viewportHeight;
-            const ratio = INITIAL_LIT_RATIO;
-            const startPosition =
-              (initialTop + ratio * textHeight - ratio * endPosition) /
-              (1 - ratio);
-
-            return `top ${startPosition}px`;
-          },
-          end: () => `bottom ${0.95 * scroller.offsetHeight}px`,
-          scrub: 1,
-        },
       });
 
       gsap.from(".stack-reveal", {
@@ -153,10 +126,53 @@ export default function About() {
     { scope: containerRef },
   );
 
+  // Separate hook so a theme flip rebuilds only the character scrub —
+  // entrances must not replay. GSAP can't tween to a CSS variable, so the
+  // lit color is resolved from the active theme at build time.
+  useGSAP(
+    () => {
+      const scroller = scrollerRef.current;
+      const text = textRef.current;
+      const litColor =
+        getComputedStyle(document.documentElement)
+          .getPropertyValue("--color-white")
+          .trim() || "#ffffff";
+
+      const initialTop =
+        text.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
+      const INITIAL_LIT_RATIO = 0.15;
+
+      gsap.to(".text-char", {
+        color: litColor,
+        opacity: 1,
+        duration: 2,
+        stagger: 0.05,
+        scrollTrigger: {
+          trigger: text,
+          scroller,
+          start: () => {
+            const viewportHeight = scroller.offsetHeight;
+            const textHeight = text.offsetHeight;
+            const endPosition = 0.95 * viewportHeight;
+            const ratio = INITIAL_LIT_RATIO;
+            const startPosition =
+              (initialTop + ratio * textHeight - ratio * endPosition) /
+              (1 - ratio);
+
+            return `top ${startPosition}px`;
+          },
+          end: () => `bottom ${0.95 * scroller.offsetHeight}px`,
+          scrub: 1,
+        },
+      });
+    },
+    { scope: containerRef, dependencies: [theme] },
+  );
+
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-screen h-dvh overflow-hidden bg-black"
+      className="page-bg relative w-full h-screen h-dvh overflow-hidden bg-black"
     >
       <Meta
         title="About"
@@ -240,7 +256,7 @@ export default function About() {
       <div className="fixed right-6 top-[20%] bottom-[20%] z-50 hidden w-[3px] overflow-hidden rounded-full bg-zinc-900 md:block">
         <div
           ref={scrollbarRef}
-          className="h-full w-full origin-top rounded-full bg-neon shadow-[0_0_10px_#B8FF00]"
+          className="h-full w-full origin-top rounded-full bg-neon shadow-[0_0_10px_var(--color-neon-glow)]"
           style={{ transform: "scaleY(0)" }}
         />
       </div>
