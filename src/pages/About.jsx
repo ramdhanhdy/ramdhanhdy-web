@@ -137,8 +137,12 @@ export default function About() {
         .getPropertyValue("--color-white")
         .trim();
 
+      // Absolute offset within the scroll content — adding scrollTop keeps
+      // this stable when the theme hook re-runs after the user has scrolled.
       const initialTop =
-        text.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
+        text.getBoundingClientRect().top -
+        scroller.getBoundingClientRect().top +
+        scroller.scrollTop;
       const INITIAL_LIT_RATIO = 0.15;
 
       gsap.to(".text-char", {
