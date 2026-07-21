@@ -375,7 +375,7 @@ export default function Overview3D() {
             >
               {/* Card face — clipping/rounding lives here so the callout can overflow the card */}
               <div
-                className={`relative w-full h-full rounded-xl overflow-hidden border border-white/[0.08] shadow-2xl light:shadow-[0_24px_70px_-16px_rgba(28,27,23,0.22),0_2px_8px_rgba(28,27,23,0.05)] ${
+                className={`relative w-full h-full rounded-xl overflow-hidden border border-white/[0.08] shadow-2xl light:shadow-[0_2px_4px_rgba(23,25,20,0.05),0_18px_42px_rgba(23,25,20,0.11)] ${
                   project.image
                     ? ''
                     : 'transition-colors duration-500 light:group-hover:border-neon/40'

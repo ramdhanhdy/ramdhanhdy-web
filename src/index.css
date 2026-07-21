@@ -48,19 +48,20 @@ html[data-theme="light"] {
   --color-neon: #4D7C0F;
   --color-neon-glow: rgba(77, 124, 15, 0.35);
 
-  /* Warm paper + warm ink replace pure black/white */
-  --color-black: #F5F4F0;
+  /* Warm canvas + warm ink — canvas sits below pure-white paper cards */
+  --color-black: #EEEDE8;
   --color-white: #1C1B17;
 
-  /* Zinc scale inverted around the mid-tones, slightly warmed */
+  /* Zinc scale inverted around the mid-tones, slightly warmed; quiet surfaces
+     stay a step off the canvas and off pure white cards */
   --color-zinc-300: #52525B;
   --color-zinc-400: #6E6E77;
   --color-zinc-500: #9B9BA3;
   --color-zinc-600: #ABABB2;
-  --color-zinc-700: #CFCFC4;
-  --color-zinc-800: #DFDED6;
-  --color-zinc-900: #E6E5DD;
-  --color-zinc-950: #EEEDE6;
+  --color-zinc-700: #C8C7BE;
+  --color-zinc-800: #D6D5CC;
+  --color-zinc-900: #E0DFD6;
+  --color-zinc-950: #E8E7DF;
 
   --dot-grid-color: #1C1B17;
   --preview-shadow: rgba(28, 27, 23, 0.28);
@@ -69,29 +70,47 @@ html[data-theme="light"] {
 /* Liquid glass surface — floats header chrome and toggles above content.
    Bright top edge reads as light catching the material (Apple toolbar). */
 @utility glass {
-  background-color: color-mix(in srgb, #ffffff 58%, transparent);
+  background-color: color-mix(in srgb, #ffffff 62%, transparent);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.65),
-    0 8px 24px rgba(28, 27, 23, 0.07);
+    0 6px 18px rgba(30, 32, 25, 0.05);
+  border-color: rgba(24, 28, 20, 0.13);
 }
 
 @media (prefers-reduced-transparency: reduce) {
   html[data-theme="light"] .glass {
-    background-color: #ffffff;
+    background-color: #faf9f5;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }
 }
 
-/* Ambient light on light pages — a whisper of top light + faint green depth.
+/* Light header anchor — soft top fade so chrome doesn't float on bare canvas */
+html[data-theme="light"] .site-header {
+  background: linear-gradient(
+    to bottom,
+    rgba(238, 237, 232, 0.98),
+    rgba(238, 237, 232, 0)
+  );
+}
+
+/* Ambient atmosphere on light pages — restrained green + warm dust blooms.
    Page frames opt in with .page-bg so element-level bg-black (cover boxes)
    stays flat. */
 html[data-theme="light"] .page-bg {
   background-image:
-    radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 55%),
-    radial-gradient(90% 70% at 100% 100%, rgba(77, 124, 15, 0.05) 0%, rgba(77, 124, 15, 0) 60%);
+    radial-gradient(
+      circle at 72% 42%,
+      rgba(104, 142, 60, 0.10),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at 15% 75%,
+      rgba(194, 181, 142, 0.12),
+      transparent 30%
+    );
 }
 
 /* Theme toggle reveal — the old theme holds still underneath while the new

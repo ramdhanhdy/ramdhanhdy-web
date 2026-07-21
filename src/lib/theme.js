@@ -5,7 +5,7 @@ import { useSyncExternalStore } from 'react';
 // React components subscribe via useTheme() only to re-derive values that
 // CSS variables can't reach (e.g. GSAP tween targets).
 const STORAGE_KEY = 'theme';
-const META_THEME_COLOR = { dark: '#000000', light: '#F5F4F0' };
+const META_THEME_COLOR = { dark: '#000000', light: '#EEEDE8' };
 
 const listeners = new Set();
 const notify = () => listeners.forEach((listener) => listener());
