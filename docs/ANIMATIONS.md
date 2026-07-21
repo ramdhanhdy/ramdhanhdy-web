@@ -73,7 +73,7 @@ beneath it instead of hard-clipping.
 **The pattern (copy it exactly when building a new scrollable page):**
 
 ```jsx
-<div className="w-full h-screen h-dvh overflow-hidden bg-black">   {/* page frame */}
+<div className="page-bg w-full h-screen h-dvh overflow-hidden bg-black">   {/* page frame */}
   <div
     className="w-full h-full overflow-y-auto no-scrollbar pt-32 pb-24 ..."
     style={{
@@ -268,8 +268,10 @@ the right image per row, no stuck hover after fast scrolling, clicks navigate.
 
 - `TextReveal` splits paragraphs into per-character `<span class="text-char">`
   elements (opacity 0.2, zinc-500).
-- A ScrollTrigger-scrubbed `gsap.to('.text-char', { color: '#fff', opacity: 1,
-  stagger: 0.05, scrub: 1 })` lights characters up as the user scrolls.
+- A ScrollTrigger-scrubbed `gsap.to('.text-char', { color: <computed
+  --color-white>, opacity: 1, stagger: 0.05, scrub: 1 })` lights characters
+  up as the user scrolls. The lit color is resolved from the active theme
+  (see Theme invariant below) — never a literal `'#fff'` / `'#ffffff'`.
 - **Critical:** the page scrolls in an inner div (scroll-mask pattern, §2), so
   both ScrollTriggers pass `scroller: scrollerRef.current`. If you copy this
   pattern to a new page, forgetting `scroller:` means the animation simply
@@ -282,9 +284,11 @@ the right image per row, no stuck hover after fast scrolling, clicks navigate.
 
 **Theme invariant:** the lit color is NOT hardcoded — the char tween resolves
 `--color-white` from the active theme, in a dedicated `useGSAP` hook with
-`dependencies: [theme]`. This rebuilds only the char scrub on theme flips;
-the entrance/stack/progress animations must NOT replay. Never tween to a
-literal `'#ffffff'` — it would be invisible on the light theme's paper.
+`dependencies: [theme]` and `revertOnUpdate: true` (required so @gsap/react
+tears down the previous scrub before rebuilding). This rebuilds only the char
+scrub on theme flips; the entrance/stack/progress animations must NOT replay.
+Never tween to a literal `'#ffffff'` — it would be invisible on the light
+theme's paper.
 
 **Verify:** characters light progressively while scrolling (already partially
 lit at top), progress bar reaches exactly full at the bottom. Toggle the

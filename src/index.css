@@ -5,6 +5,7 @@
 @import "tailwindcss";
 
 @custom-variant light (&:where([data-theme="light"] *));
+@custom-variant dark (&:where([data-theme="dark"] *));
 
 @theme {
   --color-neon: #C6FF00;

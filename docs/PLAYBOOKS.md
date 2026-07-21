@@ -161,7 +161,7 @@ HTML comments cause a build error in MDX.
    ```jsx
    <TransitionLink
      to="/new-page"
-     className={`px-4 py-2 rounded-full border text-sm transition-colors duration-300 ${
+     className={`px-2 sm:px-4 py-2 rounded-full border text-xs sm:text-sm transition-colors duration-300 light:glass ${
        isActive('/new-page')
          ? 'border-white text-white bg-white/5'
          : 'border-zinc-800 text-white hover:bg-neon hover:text-black hover:border-neon'

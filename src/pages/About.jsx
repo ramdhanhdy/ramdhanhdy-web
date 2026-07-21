@@ -133,10 +133,9 @@ export default function About() {
     () => {
       const scroller = scrollerRef.current;
       const text = textRef.current;
-      const litColor =
-        getComputedStyle(document.documentElement)
-          .getPropertyValue("--color-white")
-          .trim() || "#ffffff";
+      const litColor = getComputedStyle(document.documentElement)
+        .getPropertyValue("--color-white")
+        .trim();
 
       const initialTop =
         text.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
@@ -166,7 +165,7 @@ export default function About() {
         },
       });
     },
-    { scope: containerRef, dependencies: [theme] },
+    { scope: containerRef, dependencies: [theme], revertOnUpdate: true },
   );
 
   return (

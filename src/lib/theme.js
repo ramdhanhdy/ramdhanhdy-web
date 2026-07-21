@@ -9,6 +9,7 @@ const META_THEME_COLOR = { dark: '#000000', light: '#F5F4F0' };
 
 const listeners = new Set();
 const notify = () => listeners.forEach((listener) => listener());
+let themeFadeTimer = null;
 
 export function getTheme() {
   return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
@@ -50,9 +51,16 @@ export function setThemeWithTransition(nextTheme, origin) {
 
   if (!document.startViewTransition || !origin) {
     const root = document.documentElement;
+    if (themeFadeTimer !== null) {
+      window.clearTimeout(themeFadeTimer);
+      themeFadeTimer = null;
+    }
     root.classList.add('theme-fade');
     applyTheme(nextTheme);
-    window.setTimeout(() => root.classList.remove('theme-fade'), 500);
+    themeFadeTimer = window.setTimeout(() => {
+      root.classList.remove('theme-fade');
+      themeFadeTimer = null;
+    }, 500);
     return;
   }
 

@@ -24,9 +24,10 @@ adaptation of the same language, not a second design system.
 - Escape hatches that DO need literal values live as CSS variables in
   `index.css` (`--dot-grid-color`, `--preview-shadow`, `--color-neon-glow`)
   with per-theme values.
-- A `@custom-variant light` exists for layout-level exceptions
-  (`light:mix-blend-normal`, `light:glass`, light-only shadows). Use it
-  sparingly — token remap should do the work first.
+- `@custom-variant light` / `@custom-variant dark` exist for layout-level
+  exceptions (`light:mix-blend-normal`, `light:glass`, `dark:bg-zinc-900/50`).
+  Use them sparingly — token remap should do the work first. Never inline the
+  `.glass` recipe in JSX; the utility is the only glass surface.
 
 ## Light palette (the remapped tokens)
 
@@ -152,9 +153,10 @@ Consequences of the remap (they are features — design with them):
 
 - At mobile widths, the centered full-name header mark is hidden; the logo and
   four navigation pills remain visible in one compact row.
-- Header padding becomes `px-3 py-3`, pills use `text-xs px-2.5` (px-3 was
-  tightened to fit the theme toggle), and desktop sizing returns from `sm`
-  upward. Verify the complete row — including the toggle — at 320px.
+- Header padding becomes `px-2.5 py-3`, pills use `text-xs px-2` (tightened so
+  logo + four pills + theme toggle fit at 320px), home/toggle are 32px on
+  mobile, and desktop sizing returns from `sm` upward. Verify the complete
+  row — including the toggle — at 320px with no horizontal overflow.
 - Mobile scrollable pages start at `pt-28`; desktop retains `pt-32` (Blog keeps
   its larger `sm:pt-40` rhythm).
 - Display headings step down one size below `sm`, preserve tight leading, and
@@ -167,7 +169,7 @@ Consequences of the remap (they are features — design with them):
 ### Buttons / pills
 
 ```
-px-4 py-2 rounded-full border text-sm transition-colors duration-300
+px-2 sm:px-4 py-2 rounded-full border text-xs sm:text-sm transition-colors duration-300 light:glass
 ```
 
 Active: `border-white text-white bg-white/5`.
