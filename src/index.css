@@ -4,8 +4,20 @@
 
 @import "tailwindcss";
 
+@custom-variant light (&:where([data-theme="light"] *));
+@custom-variant dark (&:where([data-theme="dark"] *));
+
 @theme {
   --color-neon: #C6FF00;
+  --color-neon-glow: #B8FF00;
+  /* Media surfaces (card/preview imagery) never invert with the theme —
+     overlays painted on images stay in the dark scheme in both themes. */
+  --color-onmedia: #FFFFFF;
+  --color-scrim: #000000;
+  --color-neon-media: #C6FF00;
+  /* The light theme's typographic card surface: pure white paper that never
+     blends into the warm page. Never remapped — dark mode uses zinc-950. */
+  --color-paper-card: #FFFFFF;
   --font-sans: "Inter Variable", "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, "Cascadia Mono", monospace;
 }
@@ -13,6 +25,102 @@
 @layer base {
   body {
     @apply bg-black text-white overflow-x-hidden font-sans;
+  }
+}
+
+/* ── Theming ──────────────────────────────────────────────
+   Dark is the default identity; [data-theme="light"] on <html> remaps the
+   color tokens. Tailwind v4 utilities reference var(--color-*), so every
+   token-based class re-skins at runtime without touching components. */
+html {
+  color-scheme: dark;
+}
+
+:root {
+  --dot-grid-color: #ffffff;
+  --preview-shadow: rgba(0, 0, 0, 0.9);
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+
+  /* The accent, deepened for paper contrast — same hue family, not a new one */
+  --color-neon: #4D7C0F;
+  --color-neon-glow: rgba(77, 124, 15, 0.35);
+
+  /* Warm paper + warm ink replace pure black/white */
+  --color-black: #F5F4F0;
+  --color-white: #1C1B17;
+
+  /* Zinc scale inverted around the mid-tones, slightly warmed */
+  --color-zinc-300: #52525B;
+  --color-zinc-400: #6E6E77;
+  --color-zinc-500: #9B9BA3;
+  --color-zinc-600: #ABABB2;
+  --color-zinc-700: #CFCFC4;
+  --color-zinc-800: #DFDED6;
+  --color-zinc-900: #E6E5DD;
+  --color-zinc-950: #EEEDE6;
+
+  --dot-grid-color: #1C1B17;
+  --preview-shadow: rgba(28, 27, 23, 0.28);
+}
+
+/* Liquid glass surface — floats header chrome and toggles above content.
+   Bright top edge reads as light catching the material (Apple toolbar). */
+@utility glass {
+  background-color: color-mix(in srgb, #ffffff 58%, transparent);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    0 8px 24px rgba(28, 27, 23, 0.07);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  html[data-theme="light"] .glass {
+    background-color: #ffffff;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* Ambient light on light pages — a whisper of top light + faint green depth.
+   Page frames opt in with .page-bg so element-level bg-black (cover boxes)
+   stays flat. */
+html[data-theme="light"] .page-bg {
+  background-image:
+    radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 55%),
+    radial-gradient(90% 70% at 100% 100%, rgba(77, 124, 15, 0.05) 0%, rgba(77, 124, 15, 0) 60%);
+}
+
+/* Theme toggle reveal — the old theme holds still underneath while the new
+   one grows over it in a circle from the toggle (see lib/theme.js). */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) {
+  z-index: 1;
+}
+::view-transition-new(root) {
+  z-index: 2;
+}
+
+/* No View Transitions support: soften the swap with a short color crossfade */
+@media (prefers-reduced-motion: no-preference) {
+  html.theme-fade body,
+  html.theme-fade body * {
+    transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+    transition-duration: 0.45s;
+    transition-timing-function: ease;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle-icon {
+    transition: none;
   }
 }
 

@@ -32,7 +32,7 @@ export default function Blog() {
   };
 
   return (
-    <div className="w-full h-screen h-dvh overflow-hidden bg-black">
+    <div className="page-bg w-full h-screen h-dvh overflow-hidden bg-black">
       <Meta
         title="Writing"
         description="Essays on data science, AI engineering, and communicating analysis to decision-makers."

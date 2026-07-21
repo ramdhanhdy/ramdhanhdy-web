@@ -32,7 +32,7 @@ export default function NotFound() {
   return (
     <div
       ref={containerRef}
-      className="w-full h-screen h-dvh bg-black flex flex-col items-center justify-center gap-8 sm:gap-10 px-6 sm:px-8 pt-16"
+      className="page-bg w-full h-screen h-dvh bg-black flex flex-col items-center justify-center gap-8 sm:gap-10 px-6 sm:px-8 pt-16"
     >
       <Meta title="404" description="Nothing here." />
 

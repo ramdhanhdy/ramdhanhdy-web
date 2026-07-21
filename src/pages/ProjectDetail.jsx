@@ -42,7 +42,7 @@ export default function ProjectDetail() {
   if (!project) return <NotFound />;
 
   return (
-    <div ref={containerRef} className="w-full h-screen h-dvh overflow-hidden bg-black">
+    <div ref={containerRef} className="page-bg w-full h-screen h-dvh overflow-hidden bg-black">
       <Meta
         title={project.title}
         description={project.summary}
@@ -93,15 +93,32 @@ export default function ProjectDetail() {
             )}
           </div>
 
-          {/* Cover */}
+          {/* Cover — projects without cover art get the same typographic
+              panel language as the carousel's text-only cards */}
           <div className="detail-reveal w-full aspect-[3/2] rounded-lg sm:rounded-xl overflow-hidden border border-white/[0.08] bg-black mb-12 sm:mb-16">
-            <img
-              src={project.cover}
-              alt={project.title}
-              className={`w-full h-full ${project.coverFit === 'contain' ? 'object-contain' : 'object-cover'}`}
-              fetchPriority="high"
-              decoding="async"
-            />
+            {project.cover ? (
+              <img
+                src={project.cover}
+                alt={project.title}
+                className={`w-full h-full ${project.coverFit === 'contain' ? 'object-contain' : 'object-cover'}`}
+                fetchPriority="high"
+                decoding="async"
+              />
+            ) : (
+              <div className="relative w-full h-full bg-zinc-950 light:bg-paper-card flex flex-col items-center justify-center gap-5 p-10">
+                <div
+                  className="absolute inset-0 opacity-[0.04] light:opacity-[0.07]"
+                  style={{
+                    backgroundImage: 'radial-gradient(circle, var(--dot-grid-color) 1px, transparent 1px)',
+                    backgroundSize: '24px 24px',
+                  }}
+                />
+                <div className="relative z-10 w-2 h-2 rotate-45 bg-neon" />
+                <span className="relative z-10 font-mono text-xs uppercase tracking-[0.2em] text-neon/80 text-center">
+                  {String(project.id).padStart(2, '0')} · {project.category}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* MDX body */}

@@ -66,6 +66,9 @@ src/
   `gsap.registerPlugin(useGSAP, ScrollTrigger)`.
 - **`curtainTransition`**: import from `../lib/curtain` in any component that
   needs programmatic navigation (non-`TransitionLink` clicks).
+- **`useTheme` / `setThemeWithTransition`**: import from `../lib/theme`. Only
+  reach for `useTheme()` when JS needs the resolved palette (GSAP color
+  tweens); styling alone should never need it.
 - **`projects` / `posts`**: import from `../lib/content` (or
   `../../lib/content` from `components/work/`).
 
@@ -102,7 +105,7 @@ export default function PageName() {
   }, { scope: containerRef });
 
   return (
-    <div ref={containerRef} className="w-full h-screen h-dvh overflow-hidden bg-black">
+    <div ref={containerRef} className="page-bg w-full h-screen h-dvh overflow-hidden bg-black">
       <Meta title="..." description="..." />
       {/* scroll-mask container + content */}
     </div>
@@ -114,11 +117,18 @@ export default function PageName() {
 
 1. **`<Meta />`** — for SEO/head tags.
 2. **`h-screen h-dvh overflow-hidden`** on the outermost div — pages do not use
-   document scroll.
+   document scroll. Add the **`page-bg`** marker class — the light theme's
+   ambient gradient targets it.
 3. **Scroll-mask pattern** if the page scrolls (see ANIMATIONS.md §2).
 4. **`useGSAP` with `{ scope }`** for any mount-time animation.
 5. **`key={slug}`** on the scroll container in detail pages — resets scroll
    position on param change.
+6. **No hardcoded colors** — token classes only (`bg-black`, `text-zinc-400`,
+   `text-neon`…). The light theme remaps tokens; literals like `#fff` or
+   `rgba(0,0,0,.5)` cannot follow. Themed exceptions go through CSS variables
+   defined per-theme in `index.css` (see `--dot-grid-color`). Overlays on
+   imagery use the theme-stable media tokens (`onmedia`, `scrim`,
+   `neon-media`) — see the media-surface rule in DESIGN-SYSTEM.md.
 
 ## CSS conventions
 

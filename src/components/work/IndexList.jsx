@@ -169,7 +169,7 @@ export default function IndexList() {
       <div
         ref={imageRef}
         data-testid="project-preview"
-        className="pointer-events-none fixed left-0 top-0 z-30 hidden h-[220px] w-[330px] scale-75 overflow-hidden rounded-lg border border-white/15 bg-zinc-950 opacity-0 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.9)] md:block"
+        className="pointer-events-none fixed left-0 top-0 z-30 hidden h-[220px] w-[330px] scale-75 overflow-hidden rounded-lg border border-white/15 bg-zinc-950 opacity-0 shadow-[0_30px_80px_-20px_var(--preview-shadow)] md:block"
       >
         {activeProject?.image ? (
           <div className="relative h-full w-full">
@@ -181,19 +181,19 @@ export default function IndexList() {
               height="220"
               decoding="async"
             />
-            <div className="absolute inset-0 bg-neon mix-blend-overlay opacity-15 pointer-events-none" />
-            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-neon-media mix-blend-overlay opacity-15 pointer-events-none" />
+            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-scrim/80 to-transparent pointer-events-none" />
             <div className="absolute inset-x-4 bottom-3 flex items-end justify-between gap-4 font-mono text-[9px] uppercase tracking-[0.18em]">
-              <span className="text-white/80">{activeProject.category}</span>
-              <span className="text-neon">{activeProject.year}</span>
+              <span className="text-onmedia/80">{activeProject.category}</span>
+              <span className="text-neon-media">{activeProject.year}</span>
             </div>
           </div>
         ) : activeProject ? (
-          <div className="w-full h-full flex flex-col items-center justify-center gap-2 p-4 bg-zinc-950 relative">
+          <div className="w-full h-full flex flex-col items-center justify-center gap-2 p-4 bg-zinc-950 light:bg-paper-card relative">
             <div
-              className="absolute inset-0 opacity-[0.04]"
+              className="absolute inset-0 opacity-[0.04] light:opacity-[0.07]"
               style={{
-                backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)',
+                backgroundImage: 'radial-gradient(circle, var(--dot-grid-color) 1px, transparent 1px)',
                 backgroundSize: '18px 18px',
               }}
             />

@@ -330,9 +330,19 @@ export default function Overview3D() {
   return (
     <div
       ref={containerRef}
-      className="w-full h-full flex items-center justify-center overflow-hidden cursor-default md:cursor-ns-resize touch-none"
+      className="relative w-full h-full flex items-center justify-center overflow-hidden cursor-default md:cursor-ns-resize touch-none"
       style={{ perspective: `${PERSPECTIVE}px`, perspectiveOrigin: PERSPECTIVE_ORIGIN }}
     >
+      {/* Botanical glow — the light theme's depth cue. Cards separate by
+          occluding this light; static on purpose (no vestibular motion). */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 pointer-events-none hidden light:block"
+        style={{
+          background:
+            'radial-gradient(42% 46% at 60% 46%, color-mix(in srgb, var(--color-neon) 12%, transparent), transparent 72%)',
+        }}
+      />
       <div
         ref={stackRef}
         className="relative"
@@ -365,15 +375,20 @@ export default function Overview3D() {
             >
               {/* Card face — clipping/rounding lives here so the callout can overflow the card */}
               <div
-                className="relative w-full h-full rounded-xl overflow-hidden border border-white/[0.08] shadow-2xl"
+                className={`relative w-full h-full rounded-xl overflow-hidden border border-white/[0.08] shadow-2xl light:shadow-[0_24px_70px_-16px_rgba(28,27,23,0.22),0_2px_8px_rgba(28,27,23,0.05)] ${
+                  project.image
+                    ? ''
+                    : 'transition-colors duration-500 light:group-hover:border-neon/40'
+                }`}
                 style={{ transform: 'translateZ(0)' /* Mitigate Chrome/Safari border-radius rendering bugs */ }}
               >
               {project.image ? (
                 <>
-                  {/* Depth overlay — gets darker for deeper cards */}
-                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors duration-500 z-10" />
+                  {/* Depth overlay — a media surface, so the scrim stays dark
+                      in both themes (images don't invert with the page) */}
+                  <div className="absolute inset-0 bg-scrim/30 group-hover:bg-scrim/10 transition-colors duration-500 z-10" />
                   {/* Permanent contrast behind titles on bright cover art */}
-                  <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/90 via-black/45 to-transparent z-10 pointer-events-none" />
+                  <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-scrim/90 via-scrim/45 to-transparent z-10 pointer-events-none" />
 
                   {/* Project image */}
                   <img
@@ -388,29 +403,31 @@ export default function Overview3D() {
 
                   {/* Bottom-left text overlay */}
                   <div className="absolute bottom-5 left-6 z-20 flex flex-col gap-1">
-                    <h2 className="text-xl font-semibold text-white drop-shadow-lg">
+                    <h2 className="text-xl font-semibold text-onmedia drop-shadow-lg">
                       {project.title}
                     </h2>
                   </div>
 
                   {/* Year badge */}
                   <div className="absolute bottom-5 right-6 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                    <span className="text-xs text-zinc-400 font-mono">{project.year}</span>
+                    <span className="text-xs text-onmedia/60 font-mono">{project.year}</span>
                   </div>
                 </>
               ) : (
-                /* Text-only card — typography is the hero, no image */
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-10 bg-zinc-950">
+                <>
+                {/* Text-only card — typography is the hero. A themed surface
+                    (not media): dark card in dark mode, white paper card in
+                    light so it never blends into the page. No veil —
+                    paper-on-paper would wash it out. */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-10 bg-zinc-950 light:bg-paper-card">
                   {/* Subtle dot-grid texture */}
                   <div
-                    className="absolute inset-0 opacity-[0.04]"
+                    className="absolute inset-0 opacity-[0.04] light:opacity-[0.07]"
                     style={{
-                      backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)',
+                      backgroundImage: 'radial-gradient(circle, var(--dot-grid-color) 1px, transparent 1px)',
                       backgroundSize: '24px 24px',
                     }}
                   />
-                  {/* Depth overlay for consistency with image cards */}
-                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors duration-500 z-10" />
 
                   {/* Neon diamond mark */}
                   <div className="relative z-20 w-2 h-2 rotate-45 bg-neon mb-2" />
@@ -435,6 +452,7 @@ export default function Overview3D() {
                     <span className="text-xs text-zinc-400 font-mono">{project.year}</span>
                   </div>
                 </div>
+                </>
               )}
               </div>
 
@@ -454,9 +472,8 @@ export default function Overview3D() {
               >
                 {/* Bent-wire leader: vertical rise, 45° fold, horizontal run */}
                 <path
-                  className="callout-path"
+                  className="callout-path stroke-neon"
                   d="M8 84 L8 50 L40 18 L276 18"
-                  stroke="#C6FF00"
                   strokeWidth="1.5"
                   pathLength="1"
                   strokeDasharray="1"
@@ -464,17 +481,16 @@ export default function Overview3D() {
                 />
                 {/* Diamond anchor pinned to the card */}
                 <rect
-                  className="callout-marker"
+                  className="callout-marker fill-neon"
                   x="4"
                   y="80"
                   width="8"
                   height="8"
                   transform="rotate(45 8 84)"
-                  fill="#C6FF00"
                 />
               </svg>
               <div
-                className="callout-label absolute right-0 top-[18px] -translate-y-1/2 opacity-0 min-w-[218px] bg-black/90 backdrop-blur-sm border border-neon/50 px-3 py-2 font-mono whitespace-nowrap"
+                className="callout-label absolute right-0 top-[18px] -translate-y-1/2 opacity-0 min-w-[218px] bg-black/90 backdrop-blur-sm border border-neon/50 px-3 py-2 font-mono whitespace-nowrap light:shadow-[0_12px_32px_-8px_rgba(28,27,23,0.18)]"
               >
                 <span className="block text-[11px] font-semibold tracking-[0.06em] text-white">
                   {project.title}

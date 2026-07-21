@@ -120,7 +120,7 @@ HTML comments cause a build error in MDX.
      }, { scope: containerRef });
 
      return (
-       <div ref={containerRef} className="w-full h-screen h-dvh overflow-hidden bg-black">
+       <div ref={containerRef} className="page-bg w-full h-screen h-dvh overflow-hidden bg-black">
          <Meta title="New Page" description="Page description." />
          <div
            className="w-full h-full overflow-y-auto no-scrollbar pt-32 pb-24 px-6 md:px-12"
@@ -161,7 +161,7 @@ HTML comments cause a build error in MDX.
    ```jsx
    <TransitionLink
      to="/new-page"
-     className={`px-4 py-2 rounded-full border text-sm transition-colors duration-300 ${
+     className={`px-2 sm:px-4 py-2 rounded-full border text-xs sm:text-sm transition-colors duration-300 light:glass ${
        isActive('/new-page')
          ? 'border-white text-white bg-white/5'
          : 'border-zinc-800 text-white hover:bg-neon hover:text-black hover:border-neon'

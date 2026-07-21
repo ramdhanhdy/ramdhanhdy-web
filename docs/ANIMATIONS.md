@@ -73,7 +73,7 @@ beneath it instead of hard-clipping.
 **The pattern (copy it exactly when building a new scrollable page):**
 
 ```jsx
-<div className="w-full h-screen h-dvh overflow-hidden bg-black">   {/* page frame */}
+<div className="page-bg w-full h-screen h-dvh overflow-hidden bg-black">   {/* page frame */}
   <div
     className="w-full h-full overflow-y-auto no-scrollbar pt-32 pb-24 ..."
     style={{
@@ -268,8 +268,10 @@ the right image per row, no stuck hover after fast scrolling, clicks navigate.
 
 - `TextReveal` splits paragraphs into per-character `<span class="text-char">`
   elements (opacity 0.2, zinc-500).
-- A ScrollTrigger-scrubbed `gsap.to('.text-char', { color: '#fff', opacity: 1,
-  stagger: 0.05, scrub: 1 })` lights characters up as the user scrolls.
+- A ScrollTrigger-scrubbed `gsap.to('.text-char', { color: <computed
+  --color-white>, opacity: 1, stagger: 0.05, scrub: 1 })` lights characters
+  up as the user scrolls. The lit color is resolved from the active theme
+  (see Theme invariant below) — never a literal `'#fff'` / `'#ffffff'`.
 - **Critical:** the page scrolls in an inner div (scroll-mask pattern, §2), so
   both ScrollTriggers pass `scroller: scrollerRef.current`. If you copy this
   pattern to a new page, forgetting `scroller:` means the animation simply
@@ -280,8 +282,42 @@ the right image per row, no stuck hover after fast scrolling, clicks navigate.
 - The neon progress bar (right edge, hidden on mobile) is a `scaleY 0→1` scrub
   of `contentRef` scroll progress, `transform-origin: top`.
 
+**Theme invariant:** the lit color is NOT hardcoded — the char tween resolves
+`--color-white` from the active theme, in a dedicated `useGSAP` hook with
+`dependencies: [theme]` and `revertOnUpdate: true` (required so @gsap/react
+tears down the previous scrub before rebuilding). This rebuilds only the char
+scrub on theme flips; the entrance/stack/progress animations must NOT replay.
+Never tween to a literal `'#ffffff'` — it would be invisible on the light
+theme's paper.
+
 **Verify:** characters light progressively while scrolling (already partially
-lit at top), progress bar reaches exactly full at the bottom.
+lit at top), progress bar reaches exactly full at the bottom. Toggle the
+theme mid-page: chars stay lit in the new theme's ink color without the
+entrance animations replaying.
+
+---
+
+## 5b. Theme toggle reveal (site-wide)
+
+**Files:** `src/lib/theme.js`, `src/components/ThemeToggle.jsx`, `src/index.css`
+
+- The toggle animates a **circular reveal from its own center**:
+  `document.startViewTransition(() => applyTheme(next))`, then a WAAPI
+  clip-path `circle(0 → viewport-radius)` on `::view-transition-new(root)`.
+  The old theme's snapshot holds still underneath (both root snapshots have
+  `animation: none` in index.css) — the new theme grows over it.
+- Fallbacks: no `startViewTransition` → `html.theme-fade` class for 500ms
+  (color-only CSS transitions, scoped to `body *`). `prefers-reduced-motion`
+  → instant swap, no reveal, no fade.
+- Icon: Sun/Moon crossfade with rotation (CSS transitions, killed under
+  reduced motion). Press feedback is `motion-safe:active:scale-90`.
+- GSAP-driven pages don't observe the attribute; only About subscribes via
+  `useTheme()` (see §5). Everything else re-skins through CSS variables.
+
+**Verify:** click the toggle — a circle of the new theme grows from the
+button and settles in ~0.65s with no flash of unstyled content; reload keeps
+the choice; `meta[name="theme-color"]` matches; reduced-motion emulation
+swaps instantly.
 
 ---
 
