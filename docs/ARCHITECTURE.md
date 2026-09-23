@@ -17,7 +17,7 @@ build time. There is no backend, no CMS, no server rendering.
 | Animation | GSAP 3 + `@gsap/react` | Primary animation engine, used everywhere |
 | Animation | Framer Motion | **Blog list page only.** Do not spread it to other pages |
 | Routing | React Router 7 (`react-router-dom`) | BrowserRouter, nested under one `Layout` |
-| Content | MDX (`@mdx-js/rollup` + remark-frontmatter + remark-mdx-frontmatter) | Frontmatter exported as a named `frontmatter` export |
+| Content | MDX (`@mdx-js/rollup` + frontmatter + `remark-math` + `rehype-katex`) | Frontmatter exported as a named `frontmatter` export; equations render at build time |
 | Fonts | Fontsource variable fonts | Inter Variable (sans), JetBrains Mono Variable (mono), self-hosted |
 | Icons | `lucide-react` | Available but barely used; inline SVG preferred for brand marks |
 

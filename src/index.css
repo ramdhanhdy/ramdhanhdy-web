@@ -1,6 +1,7 @@
 /* Self-hosted variable fonts (no external font CDN round-trip) */
 @import "@fontsource-variable/inter";
 @import "@fontsource-variable/jetbrains-mono";
+@import "katex/dist/katex.min.css";
 
 @import "tailwindcss";
 
@@ -189,6 +190,12 @@ html[data-theme="light"] .page-bg {
 .case-prose code {
   @apply font-mono text-base text-neon/90 bg-zinc-900 px-1.5 py-0.5 rounded;
 }
+.case-prose .katex {
+  font-size: 1.05em;
+}
+.case-prose .katex-display {
+  @apply my-8 overflow-x-auto overflow-y-hidden py-2 text-left;
+}
 .case-prose pre {
   @apply bg-zinc-950 border border-zinc-800 rounded-xl p-6 my-8 overflow-x-auto;
 }
@@ -196,13 +203,56 @@ html[data-theme="light"] .page-bg {
   @apply bg-transparent p-0 text-zinc-300;
 }
 .case-prose img {
-  @apply rounded-xl border border-white/[0.08] my-8 w-full;
+  @apply rounded-xl border border-white/[0.08] mt-8 mb-3 w-full;
+}
+.case-prose a:has(> img) {
+  @apply block no-underline cursor-zoom-in;
+}
+.case-prose img + em,
+.case-prose a:has(> img) + em {
+  @apply block text-sm leading-relaxed text-zinc-500 mb-8;
 }
 .case-prose hr {
   @apply border-zinc-800 my-12;
 }
 .case-prose strong {
   @apply text-white font-semibold;
+}
+.case-prose aside {
+  @apply my-8 rounded-xl border border-zinc-800 border-l-2 border-l-neon bg-zinc-950/60 px-5 py-5 sm:px-6;
+}
+.case-prose aside > strong:first-child {
+  @apply block font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-neon mb-2;
+}
+.case-prose aside p {
+  @apply mb-0 text-zinc-200;
+}
+.case-prose aside p + p {
+  @apply mt-3 pt-3 border-t border-zinc-800/70 text-zinc-400;
+}
+.case-prose aside p strong {
+  @apply text-zinc-200 font-semibold;
+}
+.case-prose table {
+  @apply w-full my-8 text-base border-collapse;
+}
+.case-prose thead th {
+  @apply font-mono text-xs uppercase tracking-widest text-zinc-500 text-left font-medium border-b border-zinc-800 pb-3 pr-4 align-bottom;
+}
+.case-prose tbody td {
+  @apply border-b border-zinc-800/60 py-3 pr-4 align-top text-zinc-300;
+}
+.case-prose tbody td:first-child {
+  @apply text-white font-medium whitespace-nowrap;
+}
+.case-prose dl {
+  @apply my-8 flex flex-col gap-6;
+}
+.case-prose dt {
+  @apply font-mono text-sm font-medium uppercase tracking-widest text-neon;
+}
+.case-prose dd {
+  @apply text-zinc-300 border-l-2 border-zinc-800 pl-4;
 }
 
 @media (max-width: 639px) {
@@ -226,5 +276,8 @@ html[data-theme="light"] .page-bg {
   }
   .case-prose img {
     @apply rounded-lg my-6;
+  }
+  .case-prose table {
+    @apply block overflow-x-auto text-sm;
   }
 }

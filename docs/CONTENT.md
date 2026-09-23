@@ -128,6 +128,10 @@ draft: false                                     # optional — true hides it
 - The body renders inside `<div class="case-prose">` (see DESIGN-SYSTEM.md
   for the styled elements). Don't add inline styles or className hacks —
   extend `.case-prose` in `index.css` if you need new element styling.
+- Inline math uses `$...$`; display equations use `$$` on their own lines
+  with the expression on a separate line. `remark-math` and `rehype-katex`
+  render both at build time. Long display equations scroll within the prose
+  column on narrow screens.
 
 ## Cover images
 

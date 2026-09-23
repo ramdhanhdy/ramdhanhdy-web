@@ -8,8 +8,8 @@ import { useTheme } from "../lib/theme";
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 const paragraphs = [
-  "I'm Ramdhan Hidayat, a Data & AI Engineer and web developer based in Indonesia. My work revolves around building systems that sit between raw data and the people who rely on it. Whether I'm orchestrating multi-agent workflows, running LLM evaluations, or designing web interfaces, my focus is on making complex technology feel simple, reliable, and practical in the real world.",
-  "I care a lot about the quiet mechanics of a project. That means paying attention to how an evaluation framework catches the edge cases a demo hides, how a data pipeline holds up under load, and whether an interface actually feels intuitive. The goal is always to build tools that are direct, concrete, and stay completely out of the user's way.",
+  "I'm Ramdhan Hidayat, a Data Scientist & AI Engineer based in Indonesia. My work revolves around building systems that sit between raw data and the people who rely on it, plus the occasional web development project when an idea needs an interface. My focus is on making complex technology feel simple, reliable, and practical in the real world.",
+  "I care a lot about the quiet mechanics of a project. That means paying attention to how an evaluation framework catches the edge cases that's tricky to catch, how a data pipeline holds up under load, and whether an interface actually feels intuitive. The goal is always to build tools that are direct, concrete, and stay completely out of the user's way.",
   "Outside of work, I spend my time lifting at the gym, reading the latest AI papers to keep up with how fast the field is moving, and watching football. When I want to unwind, I enjoy strategy and managerial games like Football Manager to just take a step back and process things."
 ];
 

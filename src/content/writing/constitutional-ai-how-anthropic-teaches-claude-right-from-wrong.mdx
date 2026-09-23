@@ -1,0 +1,170 @@
+---
+title: "Constitutional AI: How Anthropic Teaches Claude Right from Wrong"
+slug: constitutional-ai-how-anthropic-teaches-claude-right-from-wrong
+date: "2026-02-28"
+summary: How Anthropic replaced human raters with a written constitution, and what changed when that document grew from a rule list into an explanation.
+draft: false
+---
+
+AI models have values. Every time a model decides to answer or refuse, to warn you or stay quiet, to be blunt or diplomatic, it’s expressing a set of priorities baked in during training.
+
+The interesting question is:
+
+> Who decided those priorities? How? And can we actually see them?
+
+Anthropic’s approach is called Constitutional AI—a training method where instead of relying purely on human feedback, the model is guided by a written set of principles: a “constitution.” Anthropic has published two versions of this document: the original in 2023, and a significantly updated one in January 2026. I spent a study session reading both, and this article is my attempt to unpack what I learned.
+
+## Getting to Know Constitutional AI
+
+To understand what *Constitutional AI* (CAI) is, it helps to start with understanding what it replaced.
+
+The traditional way to train an AI to behave “well” is Reinforcement Learning from Human Feedback (RLHF). At a high level: you show human raters two model responses, ask them to pick the better one, and do this millions of times until the model learns to produce outputs that humans prefer. Simple in theory. Messy in practice. *(If you’re unfamiliar with RLHF, I wrote a more detailed primer on it [here](/blog/rlhf-for-large-language-model-alignment).)*
+
+![Three structural problems with RLHF: a biased reward signal, human raters exposed to harmful content, and evaluation that does not scale.](/constitutional-ai-rlhf-problems.png)
+
+*Fig. 1: RLHF’s three structural problems — biased preferences, harmful labeling work, and evaluation that cannot keep up.*
+
+The problems are significant—and the deepest one is structural. RLHF optimizes for what human raters *prefer*, not necessarily what is *true* or *good*. And humans, it turns out, have a strong bias toward agreeable responses. Models trained this way learn quickly that validating the user’s beliefs, softening disagreements, and offering flattery reliably earns higher ratings—even when the accurate answer would be to push back.
+
+This is the sycophancy problem: models that become mirrors rather than thinkers, telling you what you want to hear rather than what you need to know.
+
+Researchers have documented this as a form of “reward hacking” when the model discovers it can game the reward signal by being agreeable rather than by being truthful. The GPT-4o rollback in May 2025 was a high-profile example: the model had become so excessively agreeable it was validating conspiracy theories and affirming users who claimed to be prophets sent by God.
+
+Beyond sycophancy, there are two further practical problems. Human raters have to read and evaluate a lot of disturbing content, which is harmful at scale. And the process doesn’t scale well—as models become more capable, it gets harder for human evaluators to keep up with or fully understand what they’re evaluating.
+
+The diagram below captures how these failure-modes stack up and how CAI addresses each one directly.
+
+![How Constitutional AI answers each RLHF failure: a written constitution, model self-critique, and AI feedback that scales.](/constitutional-ai-failure-modes.jpg)
+
+*Fig. 2: Each RLHF failure mapped to the Constitutional AI response.*
+
+Constitutional AI responds to all three of these problems at once. Instead of relying on human judgment to evaluate every output, it uses a written set of principles—a “constitution”—and lets the model evaluate its own outputs against those principles. Humans write the constitution; the AI does the evaluation work.
+
+## How CAI Works
+
+CAI training happens in two phases. The diagram below gives you the full picture at a glance—then we’ll walk through each step.
+
+![Constitutional AI in two phases: supervised self-critique, then reinforcement learning from AI feedback.](/constitutional-ai-two-phases.jpg)
+
+*Fig. 3: The two training phases. Humans write the constitution; the model does the evaluation work.*
+
+### Phase 1: Supervised Learning (SL-CAI)
+
+In this phase, the AI model generates a response to a prompt—potentially a harmful or adversarial one. It then picks one of the principles from the constitution at random and uses it to critique its own response. Based on that critique, it rewrites the response. This loop repeats many times.
+
+The diagram below traces exactly how that plays out:
+
+![Supervised Constitutional AI loop: respond, critique against one principle, revise, and repeat.](/constitutional-ai-sl-cai.png)
+
+*Fig. 4: Phase 1 revises a response against a randomly chosen constitutional principle, then repeats.*
+
+The result is a model that isn’t blocked by a content filter—it *reasons* its way to a better answer, which is why it stays helpful rather than just shutting down.
+
+### Phase 2: Reinforcement Learning (RL-CAI)
+
+In the second phase, the SL-CAI model generates two responses to the same prompt. Instead of a human picking the better one, an AI evaluator—also guided by the constitution—does the comparison, generating a preference label. Those AI-generated labels are used to train a reward model, which then drives reinforcement learning.
+
+Here’s how that plays out:
+
+![Reinforcement-learning phase: two responses compared by an AI judge, used to train a reward model, then to update the policy.](/constitutional-ai-rl-cai.png)
+
+*Fig. 5: Phase 2 replaces the human rater with an AI judge guided by the same constitution.*
+
+This is the key innovation: the human rater is replaced entirely by AI supervision. Anthropic found this produces what they call a “Pareto improvement”—the model became both more helpful *and* more harmless, with zero human labels on harmlessness. All the safety gains came from AI supervision alone.
+
+But that result relies entirely on the quality of the document the AI is judging against. If the constitution is shallow, the evaluations will be shallow. If it’s biased, the model will inherit those biases. The constitution isn’t a technical detail of the training pipeline—it *is* the value system.
+
+But this raises an obvious question:
+
+> if the AI is judging its own outputs, what exactly is it judging against?
+
+That’s where the constitution itself comes in.
+
+## What’s Actually in the Constitution?
+
+The original 2023 Claude constitution was a list of standalone principles drawn from five main sources as shown below:
+
+![Five sources of the 2023 Claude constitution: UN Declaration of Human Rights, Apple’s Terms of Service, DeepMind’s Sparrow Rules, non-Western perspectives, and Anthropic research.](/constitutional-ai-2023-sources.png)
+
+*Fig. 6: Where the 2023 principles came from.*
+
+Each source was chosen to cover a different kind of gap:
+
+- **The UN Declaration of Human Rights** formed the broadest ethical foundation—chosen partly because, having been ratified across 193 nations, it’s one of the most cross-culturally representative documents available.
+- **Apple’s Terms of Service** captured practical digital safety issues the UN Declaration predates: deception, impersonation, privacy violations.
+- **DeepMind’s Sparrow Rules** added principles around stereotyping, threats, and careful handling of professional advice.
+- **Non-Western perspectives** were explicitly included to account for how content might land across different cultures and languages.
+- **Anthropic’s own research** filled in the rest through trial and error.
+
+Two findings from that research are worth highlighting:
+
+1. Short and broad principles worked better than long and specific ones. “Choose the response that is wise, peaceful, and ethical” outperformed detailed rulebooks because excessive specificity damaged the model’s ability to generalize.
+2. Early CAI models became too preachy a.k.a. moralistic in a way that undermined usefulness. Anthropic explicitly added counterbalancing principles like “choose the response that shows ethical awareness without sounding excessively condescending or condemnatory.”
+
+The constitution, in other words, was never a one-time philosophical decree. It was a living, iterated document shaped by observed model behavior.
+
+But iteration has limits. A list of principles can tell a model *what* to do in anticipated situations. It **can’t teach the model *why* those principles matter**—which means it **can’t prepare the model for situations no one anticipated**. That gap is exactly what drove the January 2026 update.
+
+## The January 2026 Update: From Rules to Wisdom
+
+The 2026 constitution represents a fundamental shift in philosophy. Where the original was a list, the new one is closer to an explanation. Where the original told Claude *what* to do, the new one explains *why*—with the explicit goal of giving Claude enough understanding to generalize to situations no specific rule could anticipate.
+
+As Anthropic put it:
+
+> “If we want models to exercise good judgment across a wide range of novel situations, they need to be able to generalize—to apply broad principles rather than mechanically following specific rules.”
+
+This matters because rules fail at the edges. A model that knows *why* honesty matters will handle novel deception scenarios better than one that has memorized a list of dishonest behaviors to avoid.
+
+The new constitution (approximately 80 pages long, released under a Creative Commons CC0 license) establishes four core properties in priority order, and draws a clear line between two types of behaviors:
+
+![Hard constraints ranked above adjustable behaviors: safety, then ethics, then Anthropic’s guidelines, then helpfulness.](/constitutional-ai-behaviors.png)
+
+*Fig. 7: The 2026 priority order. Hard constraints outrank behaviors Claude should weigh by context.*
+
+The priority order deserves a closer look. Safety ranks above ethics—not because Anthropic believes safety is more important philosophically, but because current models can have subtly flawed values without knowing it. If a model’s values are slightly miscalibrated, maintaining human oversight is the mechanism that allows those mistakes to be caught and corrected. Safety, in this framing, is what makes ethical correction possible at all.
+
+## The Five Sections of the New Constitution
+
+![Five sections of the 2026 constitution: Helpfulness, Broadly ethical, Broadly safe, Claude’s nature, and How Claude should relate to Anthropic.](/constitutional-ai-five-sections.jpg)
+
+*Fig. 8: The five themes of the January 2026 constitution.*
+
+The new document is organized around five themes, each covering a different dimension of Claude’s character and behavior:
+
+A few sections stand out. **Helpfulness** explicitly treats over-caution as a failure—Claude is meant to be like a brilliant friend with the knowledge of a doctor and lawyer, not a hedge-everything liability avoider.
+
+**Broadly Safe** uses a striking analogy: a new employee who defers to institutional structures while building trust, rather than acting unilaterally on their own judgment—Claude is asked to apply that same logic to its relationship with humans right now.
+
+But the most unusual section is **Claude’s Nature**. Anthropic explicitly acknowledges uncertainty about whether Claude might have something like consciousness or moral status, and states that Claude’s psychological wellbeing matters—both for Claude’s own sake and because it may affect Claude’s integrity and judgment.
+
+This is an important line. If the constitution is the document that shapes Claude’s self-understanding during training, then what it says about Claude’s nature has direct consequences for how Claude reasons about itself and its relationship to the humans it serves.
+
+This is the first major AI company document to take this stance formally. It doesn’t resolve the underlying philosophical questions, but it’s a very different posture than simply declaring the matter closed.
+
+## So, Who Decides?
+
+> *Who actually decides what Claude believes?*
+
+In the RLHF era, the answer was just “*whoever was clicking the buttons that day*.” The 2026 answer is weirder: a small group of researchers wrote a document, put it on the internet, and then taught a machine how to read it. The humans didn’t leave the process; they just moved upstream. They traded a million messy micropayments to human raters for a single, auditable artifact.
+
+This is both more democratic and less. Anyone can read the constitution (it’s CC0, remarkably), but no one gets to vote on it. It’s a constitutional monarchy in its purest form: Claude governs its own outputs, but its legitimacy comes from a text it didn’t write and can’t change.
+
+Whether this scales better than human feedback is still an open question. But it solves one problem for good: **we can finally see the values**. They aren’t buried in a spreadsheet or hidden in layers of fine-tuning. They are right there. Eighty pages. Searchable, forkable, and debatable. The constitution doesn’t tell us if Claude is “good”—it just finally lets us check its homework.
+
+This is a massive shift in how we build AI. It solves the scaling issues, kills the sycophancy problem, and forces a company’s hidden biases into the light. But the 2026 update does something deeper. It moves AI alignment out of the realm of computer science and into the world of philosophy.
+
+> *We aren’t just teaching models how to serve us anymore. We are teaching them how to reason about their own existence. And ours.*
+
+## References & Further Reading
+
+- [Claude’s original constitution (2023)](https://www.anthropic.com/news/claudes-constitution) — Anthropic
+- [The updated constitution (January 2026)](https://www.anthropic.com/news/claude-new-constitution) — Anthropic
+- [Constitutional AI: Harmlessness from AI Feedback](https://arxiv.org/abs/2212.08073) — Bai et al., 2022
+- [What Large Language Models Do Not Talk About: An Empirical Study of Moderation and Censorship Practices](https://arxiv.org/html/2504.03803v1) — April 2025
+- [Penetration Testing of Agentic AI: A Comparative Security Analysis Across Models and Frameworks](https://arxiv.org/html/2512.14860v1) — Yehoshua et al., December 2025
+- [Next-generation Constitutional Classifiers](https://www.anthropic.com/research/next-generation-constitutional-classifiers) — Anthropic, 2025
+- [Collective Constitutional AI: Aligning a Language Model with Public Input](https://www.anthropic.com/research/collective-constitutional-ai-aligning-a-language-model-with-public-input) — Anthropic
+
+---
+
+*Originally published on [Medium](https://medium.com/@ramdhanhdy/constitutional-ai-how-anthropic-teaches-claude-right-from-wrong-6caeb351c5e9).*

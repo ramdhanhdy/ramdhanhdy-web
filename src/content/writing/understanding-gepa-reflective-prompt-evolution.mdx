@@ -1,0 +1,181 @@
+---
+title: "Understanding GEPA: Prompt Evolution Through Reflection"
+slug: understanding-gepa-reflective-prompt-evolution
+date: "2026-09-23"
+summary: How GEPA learns from execution traces, evolves prompts without changing model weights, and keeps useful specialists in its candidate pool.
+draft: false
+---
+
+GEPA, short for **Genetic-Pareto**, is a prompt optimizer. It runs an AI system on examples, examines what happened, and uses natural-language feedback to propose better instructions. It then tests those instructions and keeps promising candidates. The model's weights stay fixed; the thing that changes is the text guiding the system.
+
+![Illustrated overview of GEPA: task attempts produce trajectories; feedback becomes plain-language rules that improve subsequent prompts. A city navigation example shows how useful rules arise from failed routes.](/gepa-commute-illustration.png)
+
+*Fig. 1: An overview of the draft's commuting analogy. The rules are written into prompts, not learned inside the model's weights.*
+
+## The intuition: navigating a new city
+
+You need to make a 5 PM gym class after work. Your first route gets caught downtown at rush hour; another route is fast on a clear day but fails when it rains. Eventually you write down practical rules: *avoid downtown after 4 PM*, *allow extra time in rain*, *take the park side street when the highway backs up*. These notes improve later trips without requiring you to calculate every turn from scratch.
+
+GEPA follows the same **trial → feedback → revised rule** pattern. A *trajectory* is the record of one system run: its intermediate outputs, available reasoning, tool calls, tool results, and final answer. A reflection model reads that record alongside a score and any diagnostic feedback, then proposes a revised prompt. The revised prompt goes through another trial before it earns a place in the candidate pool.
+
+The analogy has a limit. People can internalize habits; GEPA writes instructions outside the model and supplies them again on subsequent calls. It still performs mathematical search, and an appealing new rule may fail the next test. The paper's contribution is making the **evidence from each run** useful for revising text, while exploring more than one promising prompt.
+
+## What GEPA needs
+
+A task dataset supplies inputs and evaluation information. In the commute example, one item might pair a Friday departure request with the target arrival time and the information needed to check a proposed schedule. A *score* measures how well a run did; it could be binary correctness or a graded value. Rich feedback, such as a failed constraint or a compiler error, can tell the reflection model more than a zero alone.
+
+The optimizer also needs a **rollout budget**. A rollout is a complete run of the AI system on one example, potentially involving several model calls and tools. Evaluating candidates costs money and time, so GEPA works within a limit. The training examples should resemble real tasks, and an independent held-out set is needed to check whether improvements generalize.
+
+## The system in equations
+
+Start with an input $x$ and an output $y$. Write the whole compound AI system as $\Phi$:
+
+$$
+y = \Phi(x)
+$$
+
+The result depends on the instructions $\Pi$ and the model weights $\Theta$:
+
+$$
+y = \Phi(x; \Pi, \Theta)
+$$
+
+Here $\Pi$ may contain several prompts for different modules. $\Theta$ represents the underlying model parameters. For the commute, $x$ is the request, $y$ is the proposed route and departure time, and $m$ is the evaluation information, such as the required arrival time. A metric $\mu$ scores the output against $m$:
+
+$$
+\text{Score} = \mu\left(\Phi(x; \Pi, \Theta), m\right)
+$$
+
+![Hand-drawn diagram showing input x flowing through the compound AI system Phi to produce output y, using the 5 PM gym commute as an example.](/gepa-compound-system.png)
+
+*Fig. 2: The original draft's input–system–output diagram. The prompts and model weights configure the system inside the central box.*
+
+For a task distribution $T$, the broad optimization problem could search over both prompts and weights:
+
+$$
+\langle \Pi^*,\Theta^*\rangle = \arg\max_{\Pi,\Theta}\mathbb{E}_{(x,m)\sim T}\left[\mu\left(\Phi(x;\Pi,\Theta),m\right)\right]
+$$
+
+That equation is a **general problem statement**, not what GEPA updates. GEPA freezes $\Theta$. With $n$ examples standing in for the unknown real-world distribution and a budget $B$, its prompt-search objective can be written as:
+
+$$
+\Pi^* \approx \arg\max_{\Pi}\frac{1}{n}\sum_{i=1}^{n}\mu\left(\Phi(x_i;\Pi,\Theta_{\mathrm{frozen}}),m_i\right) \quad \text{s.t.} \quad \#\text{rollouts} \le B
+$$
+
+The average describes the outcome we want; GEPA does not exhaustively solve this argmax. It searches under a finite budget. Freezing weights is standard for prompt optimization. GEPA's distinctive choices are how it proposes prompt updates and selects candidates to revisit.
+
+## Genetic search, with a precise meaning of crossover
+
+A candidate pool can be denoted $P = \{p_1,p_2,\ldots,p_N\}$. Each $p_k$ specifies instructions for the system; the pool starts from a seed system and grows as evaluated revisions are accepted. GEPA selects a candidate, runs it on a small batch, reflects on the results, and tests an updated candidate. If it improves on that batch, the system evaluates it further for candidate selection. This is **guided mutation**: the reflection is based on observed runs, not a random edit to a sentence.
+
+The paper also studies an optional variant called **GEPA+Merge**. Its system-aware crossover combines complementary *modules* from related candidates when different branches improved different parts of a compound system. It is not a default operation that cuts two sentences apart and splices their best phrases. A single-prompt commute assistant illustrates reflection well, but module-level merge matters most when the system has multiple prompts.
+
+## Reflective prompt mutation
+
+Suppose a run tells you to leave at 4:45 PM, and the gym check reports arrival at 5:10 PM. In weight training, a numerical optimizer may use a gradient update:
+
+$$
+\Theta_{t+1}=\Theta_t-\eta\nabla_{\Theta}L(\Theta_t)
+$$
+
+Here $L$ is a loss and $\eta$ a learning rate. That is a comparison with weight optimization, **not** the only other way to optimize prompts. GEPA updates discrete text instead. A trajectory can be sketched as a sequence of states and actions:
+
+$$
+\tau = (s_1, a_1, s_2, a_2, \ldots, s_T)
+$$
+
+The symbols summarize a run; the useful record is the available text and tool feedback. A reflection operator $R$, implemented by an LLM, takes the current prompt $\pi$, trajectory $\tau$, score $s$, and feedback $f$ and proposes:
+
+$$
+\pi' = R(\pi, \tau, s, f)
+$$
+
+In the commute example, the feedback may show that the schedule ignored a rush-hour delay. The revised rule might say: *Check current traffic and leave a buffer before choosing a departure time.* GEPA tests the revision rather than assuming the diagnosis is correct. In a coding agent, an execution trace and compiler error can play the same role: they identify a failure more precisely than a bare score of zero.
+
+Reflection may also invent a persuasive but wrong explanation. Traces expose only the information a system actually records; they do not guarantee access to a model's private reasoning. GEPA uses available observations to propose an update, then relies on evaluation to decide whether to retain it.
+
+## Why the Pareto pool keeps specialists
+
+Speed and toll cost in the commute example are *different objectives*. We could write a conceptual multi-objective score as:
+
+$$
+F(p) = (f_1(p), f_2(p), \ldots, f_k(p))
+$$
+
+**GEPA's actual candidate-selection axes are different:** they are the scores on *individual examples*, not necessarily cost, speed, and accuracy as separate metrics. For candidate system $\Phi_k$ and example $i$, the score matrix is:
+
+$$
+S[k,i] = \mu\left(\Phi_k(x_i), m_i\right)
+$$
+
+Consider three **illustrative**, graded-score candidates:
+
+<table>
+<thead><tr><th>Candidate</th><th>Sunny</th><th>Rain</th><th>Accident</th></tr></thead>
+<tbody>
+<tr><td>Route A</td><td>0.95</td><td>0.60</td><td>0.40</td></tr>
+<tr><td>Route B</td><td>0.70</td><td>0.92</td><td>0.55</td></tr>
+<tr><td>Route C</td><td>0.50</td><td>0.65</td><td>0.88</td></tr>
+</tbody>
+</table>
+
+Route B has the highest simple average (about 0.72), but A wins the sunny example and C wins the accident example. For each example, GEPA identifies the best score and the candidates that achieve it:
+
+$$
+s_i^* = \max_k S[k,i]
+$$
+
+$$
+W_i = \{\Phi_k : S[k,i] = s_i^*\}
+$$
+
+Count how often each candidate belongs to a winning set; ties can credit more than one candidate. If $f(\Phi_k)$ is that win count, selection for the **next update** is weighted by:
+
+$$
+\Pr(\Phi_k)=\frac{f(\Phi_k)}{\sum_j f(\Phi_j)}
+$$
+
+All three candidates win one example in the illustration, so each can be sampled. This keeps the search from immediately focusing only on the best average. It does **not** mean GEPA deploys three different prompts for three weather conditions. After the search budget runs out, it returns a candidate selected for overall performance on its selection set. Nor does it guarantee a specialist survives forever: a rare win gives a small sampling probability, and the dataset determines which cases are visible.
+
+## What the reported results show
+
+In the [GEPA paper](https://arxiv.org/abs/2507.19457), the authors evaluate six tasks, including question answering, instruction following, math, privacy-conscious delegation, and retrieval-backed verification. On Qwen3 8B, the paper reports a **6 percentage-point average improvement over GRPO across six tasks**, with up to 20 points on an individual task and up to 35 times fewer rollouts in a task-level comparison. These are results under the paper's benchmarks and accounting, not a universal cost or accuracy guarantee. On GPT-4.1 Mini, its aggregate test score is 65.22 versus 58.67 for MIPROv2 in the paper's table, across those six tasks. The optional merge variant behaves differently by model: it helps some settings and hurts others.
+
+<picture>
+  <source media="(max-width: 639px)" srcSet="/gepa-qwen-results-mobile.png" width="864" height="1494" />
+  <img src="/gepa-qwen-results.png" width="1800" height="1188" loading="lazy" alt="Diverging bar chart of GEPA minus GRPO held-out scores on Qwen3 8B: gains on HotpotQA, IFBench, HoVer, PUPA and LiveBench-Math, with a six-point loss on AIME-2025. Exact scores are in the expandable table below." />
+</picture>
+
+*Fig. 3: GEPA minus GRPO on six held-out tasks, in percentage points. Five gains and one reversal on AIME-2025. Values are from Table 1 of the [GEPA paper](https://arxiv.org/abs/2507.19457).*
+
+<details>
+  <summary>Exact task scores behind Figure 3</summary>
+  <table>
+    <thead><tr><th>Task</th><th>GRPO</th><th>GEPA</th><th>Difference (pp)</th></tr></thead>
+    <tbody>
+      <tr><td>HotpotQA</td><td>43.33</td><td>62.33</td><td>+19.00</td></tr>
+      <tr><td>IFBench</td><td>35.88</td><td>38.61</td><td>+2.73</td></tr>
+      <tr><td>HoVer</td><td>38.67</td><td>52.33</td><td>+13.66</td></tr>
+      <tr><td>PUPA</td><td>86.66</td><td>91.85</td><td>+5.19</td></tr>
+      <tr><td>AIME-2025</td><td>38.00</td><td>32.00</td><td>−6.00</td></tr>
+      <tr><td>LiveBench-Math</td><td>51.26</td><td>51.95</td><td>+0.69</td></tr>
+    </tbody>
+  </table>
+</details>
+
+The chart shows final task scores, not the number of trial runs. The paper's “up to 35 times fewer rollouts” refers to an earlier checkpoint on a task; the total optimization budgets in its Table 1 use a different accounting.
+
+The useful practical contrast is between a scalar verdict such as *wrong* and a trajectory that shows **where** a system went wrong. When tool errors or intermediate outputs carry diagnostic information, a prompt revision can capture a reusable lesson. That is a reason to try GEPA on multi-step systems with measurable outcomes, not a reason to expect it to fix missing model capability.
+
+## When it is worth trying
+
+Use GEPA when you can run representative tasks repeatedly, measure the outcome, inspect the feedback, and afford the search. Begin with a working seed prompt and a clear score. Separate the examples used to propose changes from those used to compare candidates; keep a final held-out evaluation for the result. Review the resulting prompt for brittle instructions, safety regressions, and cases the score misses.
+
+Skip automated optimization when there is no dependable evaluator, when a single manual edit solves the problem, or when the underlying model cannot perform the task. A biased dataset can teach the wrong rule. A reflection model can misread a trace. More trials can improve the training score while hurting new tasks. The number of prompts or examples needed is application-specific; the paper does not establish a universal threshold.
+
+GEPA's core idea is modest and useful: **turn the evidence from an AI system's attempts into testable revisions of its instructions**. The equations describe the search; the readable prompt is its artifact. The best way to judge that artifact is still to run it on cases it did not help write.
+
+## Sources
+
+- [Agrawal et al., *GEPA: Reflective Prompt Evolution Can Outperform Reinforcement Learning*](https://arxiv.org/abs/2507.19457), revised February 2026. Mechanism, selection rule, and reported results.
+- [GEPA source code](https://github.com/gepa-ai/gepa). Implementation and usage details.

@@ -1,56 +1,43 @@
 ---
 title: GLMsBench
 slug: glmsbench
-category: Provider Benchmarking
-role: Data Engineering
+category: LLM Evaluation
+role: Evaluation Engineering
 year: "2026"
 order: 6
-summary: A benchmark harness comparing the same LLM across two inference providers, measuring latency, output parity, cost, and rate-limit behavior.
-stack: [Python, asyncio, httpx, pytest]
+cover: /reasoning-recurrence-raw-frequency.png
+summary: A reproducible evaluation harness that turns provider claims into defensible decisions about answer quality, response time, and uncertainty.
+stack: [Python, asyncio, httpx, scipy, pytest]
 ---
+
+import TransitionLink from '../../components/TransitionLink';
 
 ## Context
 
-Two providers serve the same underlying model (GLM-5.2) through different
-infrastructure, pricing, and rate limits. From a user's perspective, are they
-actually equivalent? A model is only as good as the infrastructure serving it,
-and "same model" doesn't guarantee same output, same speed, or same cost.
+When two services advertise the same model, a buyer still has to choose which route to put in front of people. The model name alone can't tell you whether requests finish promptly, answers arrive in a usable format, or a cheap plan stays cheap under real demand. GLMsBench exists to make that choice testable.
+
+Its first case compared GLM-5.2 through the official Z.ai API against an experimental $50 unlimited-token plan from Umans. That plan has since been discontinued, so this is a case study in how to evaluate a provider, not a buying recommendation. The companion <TransitionLink to="/blog/when-similar-benchmarks-hide-different-reasoning">benchmark and reasoning-trace article</TransitionLink> reports the results; this page covers how the comparison was built.
 
 ## Approach
 
-The harness measures four dimensions that matter to real users:
+The main run sent the same 100 ARC-Challenge science questions through each route twice, for 400 requests at temperature zero with a 1,200-token completion cap. Matching the questions and settings removes the easy explanations for a route-to-route difference.
 
-1. **Latency**: TTFT, inter-token, and end-to-end, reported as p50/p95. Two
-   populations are tracked: clean (no throttling) for apples-to-apples
-   inference speed, and effective (including backoff) for real-world experience
-   under load.
+The runner records timings, tokens, retries, backoff, rate limits, and failures alongside every response, including answers that can't be extracted. That distinction drives two separate metrics: **answer agreement**, which only compares cases where both routes returned a readable answer, and **strict task success**, which also counts unreadable, truncated, and wrong answers as failures. A service can agree on readable answers while still failing users more often. Latency is reported as median and p95, with retries and backoff recorded separately so a wait can be explained, not just measured.
 
-2. **Parity**: Cross-provider answer disagreement at temperature=0. The
-   headline number for "do these providers produce the same output?" If
-   parity drops, one of them is silently modifying the model (quantization,
-   system prompt injection, or different model version).
+The two passes of a question are repeat observations, not two new questions. Output-length inference averages the passes within each provider-question pair first, then compares the 100 matched questions. Counting all 400 requests as independent evidence would make the result look more certain than it is.
 
-3. **Cost**: Supports both metered (per-token) and subscription (flat-fee)
-   pricing models. Subscription plans are translated into an effective
-   $/1M-token range using configurable usage-intensity tiers.
+The statistics ask two different questions. A paired **95% confidence interval** on per-question differences looks for evidence of a gap. **Equivalence tests** at tolerances of ±15 and ±30 output tokens look for evidence that any gap is small enough to ignore. If the interval doesn't fit inside the tolerance, the answer is unresolved, not "equal" and not necessarily "different." The tolerance itself is a business decision; token count is only one proxy for it.
 
-4. **Rate limits**: 429s, backoff time, and retry counts per provider,
-   treated as a first-class signal rather than noise. A provider that
-   throttles aggressively may be cheaper per token but more expensive per
-   successful request.
+## Follow-up analysis
 
-## Evidence
+A second study applied the same skepticism to observational data: 18 retained coding-agent reasoning traces across two tools with different recording rules. More recorded text means more chances to observe repeated reasoning, so a raw percentage by provider would confound the route with how much was kept. **Wilson intervals** put uncertainty around small-group rates, a **length-adjusted model** compares recurrence while accounting for exposure, and a **time-to-event model** checks whether the finding survives moving the detection window.
 
-- Standard evaluation suites: MMLU, GSM8K, ARC-Challenge, HumanEval
-- p50/p95 latency reporting with clean vs effective populations
-- Cross-provider parity measurement at temperature=0
-- Cost modeling for both metered and subscription pricing
-- Rate-limit behavior tracked as first-class signal (429s, backoff, retries)
-- JSON + Markdown report output
+Those checks can expose a misleading comparison, but they can't turn observational traces into a randomized trial. Tasks, tools, and retention rules still differ.
 
 ## Outcome
 
-GLMsBench answers a question that providers don't want you to ask: when two
-services claim to serve the same model, which one actually delivers? The answer
-is rarely "they're identical," and the differences show up in latency, output
-parity, and reliability long before they show up in the price.
+The deliverable is the harness: an async runner, provider adapters, benchmark loaders, normalized request records, item-level quality reports, plots, and tests. It keeps failures and timing detail in the record so a decision-maker can separate "the model answered wrong" from "the service failed the request," and it's built to be rerun on the next provider pair rather than trusted once.
+
+[Explore GLMsBench on GitHub](https://github.com/ramdhanhdy/GLMsBench)
+
+The evidence describes specific routes, tasks, dates, and request settings. It should guide a fresh evaluation, not stand in for one.

@@ -124,7 +124,7 @@ export default function IndexList() {
             >
               <a
                 href={`/work/${project.slug}`}
-                className="relative grid w-full grid-cols-[auto_1fr] gap-x-4 gap-y-4 overflow-hidden px-3 py-6 transition-colors duration-500 ease-out hover:bg-neon sm:px-5 sm:py-8 md:grid-cols-[4.5rem_minmax(0,1fr)_auto] md:items-center md:gap-x-7 md:px-7 md:py-10"
+                className="relative grid w-full grid-cols-[auto_1fr] gap-x-4 gap-y-4 overflow-hidden px-3 py-6 transition-colors duration-500 ease-out hover:bg-neon sm:px-5 sm:py-7 md:grid-cols-[4.5rem_minmax(0,1fr)_auto] md:items-center md:gap-x-7 md:px-7 md:py-7"
                 onClick={(e) => handleRowClick(e, project.slug)}
                 onMouseEnter={() => handleMouseEnter(project)}
                 onMouseLeave={handleMouseLeave}
@@ -136,11 +136,11 @@ export default function IndexList() {
                 </div>
 
                 <div className="col-span-2 min-w-0 md:col-span-1">
-                  <h2 className="break-words text-[2rem] font-medium leading-[1.08] tracking-tight text-white transition-colors duration-500 ease-out group-hover:text-black sm:text-4xl md:text-5xl md:leading-[1.05] lg:text-[4.6vw]">
+                  <h2 className="break-words text-[1.75rem] font-medium leading-[1.12] tracking-tight text-white transition-colors duration-500 ease-out group-hover:text-black sm:text-[2rem] md:text-[2.5rem] lg:text-[clamp(2.5rem,3.2vw,3.25rem)]">
                     {project.title}
                   </h2>
 
-                  <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500 transition-colors duration-500 group-hover:text-zinc-900/70 sm:mt-4 sm:text-xs">
+                  <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500 transition-colors duration-500 group-hover:text-zinc-900/70 sm:text-xs">
                     <span>{project.category}</span>
                     {project.role && (
                       <>

@@ -1,0 +1,237 @@
+---
+title: "GLM-5.2 Provider Benchmark and Reasoning-Trace Analysis"
+slug: when-similar-benchmarks-hide-different-reasoning
+date: "2026-07-23"
+summary: "An experimental $50 coding plan from umans.ai advertised unlimited GLM-5.2 tokens. I tested it against Zhipu AI's official API to see whether the same model name means the same service."
+draft: false
+---
+
+[Umans.ai](https://app.umans.ai/register?ref=7UMVVJWA) sold an experimental coding subscription: $50, with unlimited GLM-5.2 tokens as the headline feature. A price that low raises a fair question: what exactly is being served? I used [GLMsBench](/work/glmsbench) to compare GLM-5.2 through Umans against the official Z.ai API on the same set of benchmark questions, then studied the model's reasoning behavior across real coding sessions.
+
+The two halves use different data. The benchmark measures answers, speed, and response length under a fixed request budget. The second half looks at what two coding-agent tools, OMP and Z Code, chose to write down of the model's thinking, where the tasks and the retention rules differ. Matching benchmark answers therefore say nothing about what shows up in those traces.
+
+## Key findings
+
+- **Answers matched.** Where both routes returned a readable answer, they disagreed 0% of the time. Strict task success was 93.5% (Umans) versus 95.0% (Z.ai).
+- **Speed did not.** Median response time was 13.7 seconds through Umans versus 5.8 seconds through Z.ai. The slow tail was far worse: 75.1 versus 12.6 seconds.
+- **Response length: no clear answer.** The paired difference of −26.5 tokens was too uncertain to call a real difference, and too large to call the two routes the same.
+- **Repeated reasoning tracked trace length.** How much of its thinking a session kept predicted repeated reasoning far better than which provider or tool produced it.
+- **Order held, cause did not.** Text without repetition tended to come before heavy repetition, but that ordering does not show one causes the other.
+
+## Data sources
+
+<dl>
+<dt>ARC-Challenge</dt>
+<dd>100 multiple-choice science questions from the AI2 Reasoning Challenge. This set was built so that simple keyword matching and lookup fail on it, so answering well requires actual reasoning. Used to compare answers, strict task success, speed, and response length. Each question ran twice per route at temperature zero.</dd>
+<dt>Agent traces</dt>
+<dd>238 traces from 18 real coding sessions with GLM-5.2: 140 in OMP (24 official Z.ai, 116 Umans) and 98 official-Z.ai traces in Z Code. Used to study repeated reasoning. The tasks and the retention rules here differ from the benchmark run.</dd>
+</dl>
+
+A word on terminology: the **harness** is the coding-agent tool wrapped around the model. It decides what work the model does and how much of its thinking gets written down. OMP and Z Code are the two harnesses here.
+
+The trace set is observational. I did not assign tasks to routes; I analyzed whatever the sessions happened to produce. The two factors are also not fully separable, because no Umans sessions ran in Z Code.
+
+## Benchmark design
+
+Each of the 100 questions ran twice through each route, at temperature zero, with a shared 1,200-token limit per response: 400 requests in total. Temperature zero keeps the model's own randomness low, so leftover differences are more likely to come from the service than from luck. The shared token limit means neither route gets cut off earlier than the other.
+
+Because both routes answered the same questions, I could compare them question by question. This pairing takes question difficulty out of the comparison and leaves the route as the only thing that changes. Where a question ran twice successfully, its two results were averaged, so a repeated pass does not count as fresh evidence.
+
+## Results: correctness, reliability, and speed
+
+Both routes finished all 200 requests with no rate limiting.
+
+Where an answer could be read off both routes, the two never disagreed, and the full response text matched 96% of the time. This only covers questions where both sides produced something readable, so it measures consistency.
+
+Strict task success is tougher: a request counts only if the answer is both readable and correct. It therefore catches broken formatting and cut-off responses, not just faulty reasoning. Umans reached 93.5% and Z.ai 95.0%. Five Umans responses and three Z.ai responses ran into the token limit.
+
+The bigger difference was waiting time. The median is the midpoint: half of requests finished faster than this. The 95th percentile, or p95, describes the slow tail, meaning 95% of requests finished faster than this value. The p95 is the number that matches what a user actually feels, because it shows the bad waits.
+
+Median response time was 13.7 seconds through Umans versus 5.8 seconds through Z.ai. The p95 was 75.1 versus 12.6 seconds. In this run, the Umans median was about 2.4 times the Z.ai median, and its p95 about 6.0 times the Z.ai p95. These describe one run on specific dates.
+
+<aside>
+<strong>Takeaway</strong>
+<p>The routes gave the same answers but not the same wait. For interactive coding work, the speed gap is the real difference.</p>
+<p><strong>On the main question:</strong> this is the first real point in favor of the cheap plan. Identical answers and near-identical success rates are what you would expect from the same model, not from a smaller stand-in quietly swapped in behind the name.</p>
+</aside>
+
+## Results: response length
+
+Median response length was 146 tokens for Umans and 141 for Z.ai. After averaging each question's two passes, the average length was 222.0 tokens for Umans and 195.5 for Z.ai. Averages sit well above the medians because a handful of very long responses pull them up.
+
+[![Item-level output-token distributions for GLM-5.2 through Umans and Z.ai. The means are 222.0 and 195.5 tokens, and the distributions overlap.](/glmsbench-output-token-distributions.png)](/glmsbench-output-token-distributions.png)
+
+*Fig. 1: Each point is one route's average across two passes on a question. The two clouds overlap heavily, but a few long responses pull their averages apart.*
+
+The paired difference, defined as Z.ai minus Umans, was −26.5 tokens. Its 95% confidence interval ran from −54.0 to 1.1, with `p = 0.0596`.
+
+A confidence interval is the range of differences that fits the data. This one includes zero, so no difference is still possible, and a real difference is not established at the usual 5% threshold. This does not show the routes write equally long responses: most of the interval still sits below zero.
+
+Showing two things are the same takes a different test. An equivalence test needs a margin set in advance, stating how big a gap would still count as close enough. I chose ±15 and ±30 tokens. Equivalence holds only if the whole interval fits inside the margin. The 90% interval ran from −49.5 to −3.4 tokens, which fits inside neither. The tests returned `p = 0.795` at ±15 and `p = 0.400` at ±30.
+
+[![Equivalence plot for the paired output-length difference. The 90% interval does not fit inside a plus-or-minus 15 or plus-or-minus 30 token margin.](/glmsbench-output-token-equivalence.png)](/glmsbench-output-token-equivalence.png)
+
+*Fig. 2: Neither shaded margin holds the full interval, so I cannot call the two routes practically the same on length.*
+
+So response length is genuinely unsettled in both directions. The token limit also cuts off the longest responses.
+
+<aside>
+<strong>Takeaway</strong>
+<p>"No significant difference" and "practically the same" are two separate claims. This run supported neither; Z.ai ran shorter on average, and the question stays open.</p>
+<p><strong>On the main question:</strong> the gap is about 26 tokens on responses averaging around 200, and the two routes still reached the same answers. That is a difference in wordiness. It does leave a loose end I could not close.</p>
+</aside>
+
+## How I studied reasoning patterns
+
+The benchmark says nothing about what happens between the prompt and the final answer. To look at that, I turned to coding-agent traces, where part of the model's thinking is written down.
+
+The set holds 238 traces from 18 sessions. OMP contributed 140 traces (24 official Z.ai, 116 Umans) and Z Code contributed 98 official-Z.ai traces.
+
+What I measured was **semantic recurrence**: the model finishing a return to a point in its reasoning it had already reached, such as redoing a check it already completed or reopening a choice it already settled. The wording can differ entirely, which is why repeated tool calls, long responses, and matching word sequences do not count on their own. The severity scale was fixed before any judging started:
+
+- Level 0: no completed return.
+- Level 1: one completed return.
+- Level 2: at least two completed returns to the same point.
+- Level 3: those returns take over a large part of the trace.
+
+Levels 2 and 3 are what I report. A single blinded GPT-5.6-sol pass assigned the levels after provider names were stripped out, so the judge could not be swayed by which route wrote a trace. These are still model judgments, not human review.
+
+Throughout this half, length means words of *visible thinking the tool retained*. A short trace only means less was written down.
+
+## Repeated reasoning before adjustment
+
+Inside OMP, repeated reasoning showed up in 3 of 24 official-Z.ai traces (12.5%) and 38 of 116 Umans traces (32.8%). Read alone, that looks like a provider difference. But the two groups kept very different amounts of thinking: the median trace was 42 words on the official route and 152 through Umans.
+
+The percentages carry Wilson intervals, which stay sensible when counts are small or a rate hits 0% or 100%: 4.3% to 31.0% for the official group and 24.9% to 41.7% for Umans.
+
+The ranking also broke when the harness changed. The 98 official-Z.ai traces in Z Code showed 43 positive cases (43.9%, 34.5% to 53.7%), the highest raw rate anywhere in the set, alongside the longest median trace at 444 words.
+
+[![Raw recurrence rates for official Z.ai and Umans inside OMP, next to rates within exposed-length bands.](/reasoning-recurrence-raw-frequency.png)](/reasoning-recurrence-raw-frequency.png)
+
+*Fig. 3: The plain comparison shifts once repeated reasoning is examined among traces of similar length.*
+
+<aside>
+<strong>Takeaway</strong>
+<p>The raw provider gap is tangled up with how much thinking each group wrote down.</p>
+<p><strong>On the main question:</strong> taken at face value, this number is what would look alarming, since Umans traces repeated themselves almost three times as often. It is also the number most likely to be wrong, because those traces were more than three times longer. Worth being suspicious of before treating it as evidence.</p>
+</aside>
+
+## Repeated reasoning after adjusting for trace length
+
+Across all 238 traces, repeated reasoning rose sharply with trace length:
+
+- Under 100 words: 0 of 90 (0.0%, Wilson 95% CI 0.0% to 4.1%).
+- 100 to 499 words: 14 of 63 (22.2%, 13.7% to 33.9%).
+- 500 to 1,499 words: 36 of 51 (70.6%, 57.0% to 81.3%).
+- 1,500 words or more: 34 of 34 (100%, 89.8% to 100%).
+
+[![Bar chart of repeated reasoning by trace length, rising from 0 of 90 under 100 words to 34 of 34 at 1,500 words or more.](/reasoning-recurrence-length.png)](/reasoning-recurrence-length.png)
+
+*Fig. 4: Repeated reasoning by length band. The climb is a pattern in this sample.*
+
+To pull length and route apart, I used a model that measures each one while holding the other still. It reports an odds ratio: how much the odds of an outcome shift per unit of a predictor. Above 1 means higher odds, below 1 means lower, and an interval straddling 1 leaves the direction open. Length enters on a log scale, because adding words matters in proportion, so one unit works out to roughly 2.7 times as many words. Traces from one session are correlated observations, so the intervals are widened to allow for that.
+
+Length carried a strong association: an odds ratio of 8.70 per unit of log length, with a session-clustered 95% CI of 5.24 to 14.42. A longer window of observation produces the same pattern by itself, since more text means more chances for a return to be caught. Harder tasks, later stages of a task, and how much a harness chooses to save can all stretch a trace.
+
+The route behaved differently. After adjusting for length inside OMP, the odds ratio for Umans versus official Z.ai was 0.45 (session-clustered 95% CI 0.19 to 1.03, `p = 0.059`). The estimate flipped direction against the raw rates, and its interval includes 1. No separate provider effect is established, and neither is provider equivalence.
+
+Among the 122 official-Z.ai traces, the length-adjusted odds ratio for Z Code versus OMP was 0.55 (95% CI 0.24 to 1.26). Only two OMP sessions and five Z Code sessions feed that number, and the harness label also carries task mix and retention rules with it, so an interval covering 1 does not show the harness is irrelevant.
+
+Odds ratios are hard to picture, so the same model can be read as plain probabilities. Going from about 68 to 1,104 words of visible thinking came with a 75.9 percentage-point rise in the chance of repeated reasoning (95% CI 63.4 to 88.4). Swapping the harness label from OMP to Z Code, at the lengths actually observed, moved it by only −6.3 points (95% CI −14.6 to 2.0).
+
+One last check asks how much worse the model fits when a variable is taken out, measured as deviance. A big jump means the variable was doing real work. Dropping length raised deviance by 69.74. Dropping harness raised it by 0.38.
+
+[![Probability-scale contrasts for exposed-trace length and harness. Length is associated with a 75.9 point increase. The harness contrast crosses zero.](/reasoning-length-vs-harness.png)](/reasoning-length-vs-harness.png)
+
+*Fig. 5: Adjusted comparisons among official-Z.ai traces. Length dominates; the harness effect crosses zero.*
+
+As a rougher cross-check, putting all three groups on the same length distribution gave rates of 12.5% (official, OMP), 10.0% (Umans, OMP), and 10.9% (official, Z Code). Broad bands do not remove differences in the tasks themselves, but they show how much of the raw ranking came from unequal trace length.
+
+<aside>
+<strong>Takeaway</strong>
+<p>Once trace length is accounted for, neither the provider nor the harness shows a clear effect of its own.</p>
+<p><strong>On the main question:</strong> the alarming gap turns out to be about trace length. The cheap route simply had more of its thinking written down. That said, "no clear effect" is not proof of sameness, and with 18 sessions this test could not have detected a small difference anyway.</p>
+</aside>
+
+## When repetition appeared in a trace
+
+A pattern says nothing about order, so the next question was where in a trace the repetition starts. For that I used an LLM judge, the same kind of model-graded assessment as the earlier scoring, but blinded: the traces were stripped of provider names and cut into 50-word chunks with their position markers removed, so the judge could not tell which route a trace came from or how far into the trace a chunk sat. Across the 69 traces that ended up heavily repetitive, the judge marked where the second completed return happened. That locates a window, so every estimate was recomputed three times, at the start, middle, and end of its chunk.
+
+The median event landed at 61.3% of the way through the trace. Using chunk midpoints, 25 of 69 events happened before halfway; using the cautious edge, 23 were definitely before halfway. After the event, the median trace still had 405 words to go.
+
+[![Distribution of where the second completed return occurred in 69 heavily repetitive traces. The median is at 61.3 percent of the trace.](/reasoning-recurrence-onset-timing.png)](/reasoning-recurrence-onset-timing.png)
+
+*Fig. 6: In traces that ended up heavily repetitive, the second return usually came after a lot of thinking had already piled up.*
+
+A survival model then asks a sharper question: as repetition-free text piles up, how does the chance of tipping into heavy repetition for the first time change? Its answer is a hazard ratio, the rate of the event per unit of text, where above 1 means the event grows more likely as text accumulates.
+
+Each doubling of repetition-free text came with a 1.83 times higher hazard (95% CI 1.50 to 2.23). Placing the event at the start, middle, and end of its chunk gave 1.80, 1.83, and 1.86, and all three intervals excluded 1, so the result does not hinge on where inside the window the event sits.
+
+[![Onset hazard ratios per doubling of recurrence-free exposed words, under three segment-edge assumptions. All three intervals exclude 1.](/reasoning-recurrence-onset-hazard.png)](/reasoning-recurrence-onset-hazard.png)
+
+*Fig. 7: The timing result holds up under all three plausible placements of the event.*
+
+This settles order, not cause. Harder tasks, later stages of work, and the plain fact that only long-enough traces are kept in the first place can all produce the same shape.
+
+The reverse claim is the more interesting one: once a model starts looping, does it become less likely to stop? That needs a stopping-hazard ratio below 1. The midpoint estimate was 1.49 (95% CI 0.63 to 3.54) and the chunk-end estimate 1.37 (0.58 to 3.24), both above 1. Only the chunk-start placement fell below, at 0.28 (0.08 to 0.96). When the answer flips depending on where inside a 50-word window you place the event, that claim does not hold up.
+
+[![Stopping-hazard ratios for heavy repetition under three event placements. Only the lower edge excludes 1, and it falls below 1.](/reasoning-recurrence-stop-hazard.png)](/reasoning-recurrence-stop-hazard.png)
+
+*Fig. 8: Evidence that looping keeps a trace going rests entirely on event placement, so it cannot be trusted.*
+
+<aside>
+<strong>Takeaway</strong>
+<p>Thinking piles up before heavy repetition sets in. Whether repetition then drags the trace out is too sensitive to event placement to call.</p>
+<p><strong>On the main question:</strong> this one is about how looping works in general. Both routes fit the same pattern, so nothing here is route-specific.</p>
+</aside>
+
+## Discussion and limitations
+
+The controlled benchmark found matching answers and a large speed gap, and left response length unsettled. The traces showed a strong link between trace length and how often reasoning repeated. Once length was accounted for, neither the provider nor the harness showed an effect of its own, and neither was shown to be equivalent. Repetition-free text tended to pile up before heavy repetition, but the stopping analysis was too shaky to support a causal story.
+
+The limits are worth stating plainly. No Umans sessions ran in Z Code, so provider and tool cannot be fully separated. The tasks and retention rules differ between the two samples. The word counts are of visible thinking only, so a short trace may reflect a retention rule rather than less thinking. The labels come from one model judge, not human review. With 18 sessions overall and fewer in each subgroup, the intervals are thin. And all of it describes specific routes on specific dates under a specific token limit.
+
+## Related work
+
+Other research defines looping differently. Pipis et al. (2025) count repeated word sequences and tie low-temperature looping to model capacity and problem difficulty. Duan et al. (2026) argue that reasoning can circle back before the text itself starts repeating. Liquid AI's Antidoom work finds repeated spans and trains against the token that kicks off a loop. I went with a meaning-based definition because an agent can revisit a decision in completely new words; the cost is that the result leans on a judge. These papers motivate the problem but do not validate my labels.
+
+## Conclusion: was the plan worth it?
+
+Umans has since discontinued the plan, saying it was not economically sustainable. That ending is the clearest result in this review: unlimited access to a strong model at $50 was a subsidy, not a price.
+
+On the question I set out to answer, the answer is reassuring. I found no sign the served model was a weaker stand-in: answers matched, and strict task success differed by 1.5 percentage points, well inside what 100 questions can resolve. The reasoning patterns pointed the same way, since repeated reasoning tracked how much of its thinking was written down. If the worry was a quietly downgraded model, this run did not find one.
+
+What I paid instead was waiting time. A median of 13.7 seconds against 5.8 is fine. A p95 of 75.1 seconds against 12.6 is what breaks a coding session, because the occasional long stall is when you lose your place. Heavy load on a cheap route is the obvious guess, though I did not measure it. Unlimited tokens turned out to mean unlimited tokens eventually. So the trade was real, and it was worth it for batch work and exploration; for interactive work where speed is the product, the official route was the better tool.
+
+The wider lesson outlives this one subscription. A model name on a pricing page is a claim about the weights. Speed, the slow tail, and formatting reliability are separate things, they are what shape daily use, and you can measure them in an afternoon.
+
+The runner, request logs, and per-question tests are in the [GLMsBench repository](https://github.com/ramdhanhdy/GLMsBench). The [project case study](/work/glmsbench) covers how the harness is built.
+
+## Glossary
+
+<table>
+<thead>
+<tr><th>Term</th><th>Meaning</th></tr>
+</thead>
+<tbody>
+<tr><td>Median</td><td>The middle value: half of requests were faster, half slower.</td></tr>
+<tr><td>p95</td><td>The 95th percentile: 95% of requests finished faster than this. Describes the slow tail.</td></tr>
+<tr><td>Strict task success</td><td>The share of requests giving an answer that is both readable and correct. Counts broken formatting and cut-off responses alongside wrong answers.</td></tr>
+<tr><td>Harness</td><td>The coding-agent tool wrapped around the model. It sets the work and decides how much of the model's thinking gets written down.</td></tr>
+<tr><td>Paired comparison</td><td>Comparing both routes on the same question, so question difficulty drops out.</td></tr>
+<tr><td>Confidence interval</td><td>The range of values that fits the data. Including zero means no difference is established, and equality is unproven.</td></tr>
+<tr><td>p-value</td><td>How surprising the result would be if there were no real difference. Below 0.05 is the threshold used here.</td></tr>
+<tr><td>Equivalence margin</td><td>A tolerance set in advance (±15 or ±30 tokens). Two things count as the same only if the whole interval fits inside it.</td></tr>
+<tr><td>Wilson interval</td><td>A range for percentages that stays sensible at small counts and at 0% or 100%.</td></tr>
+<tr><td>Odds ratio</td><td>How much the odds of an outcome shift per unit of a predictor. Above 1 means higher odds; an interval covering 1 settles nothing.</td></tr>
+<tr><td>Session-clustered errors</td><td>Wider error estimates that treat traces from one session as related rather than independent.</td></tr>
+<tr><td>Deviance</td><td>How much worse a model fits when a variable is taken out. A big jump means the variable mattered.</td></tr>
+<tr><td>Hazard ratio</td><td>The rate of an event per unit of text. Above 1 means the event grows more likely as text piles up.</td></tr>
+</tbody>
+</table>
+
+## References
+
+- Charilaos Pipis et al., [Wait, Wait, Wait... Why Do Reasoning Models Loop?](https://arxiv.org/abs/2512.12895), 2025.
+- Zenghao Duan et al., [Circular Reasoning: Understanding Self-Reinforcing Loops in Large Reasoning Models](https://arxiv.org/abs/2601.05693), 2026.
+- Liquid AI, [Reducing Doom Loops with Final Token Preference Optimization](https://www.liquid.ai/blog/antidoom), 2026.

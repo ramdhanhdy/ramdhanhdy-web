@@ -119,8 +119,8 @@ Consequences of the remap (they are features — design with them):
 |---|---|---|
 | Hero / detail page title | `text-5xl md:text-7xl lg:text-8xl font-semibold tracking-tighter` | ProjectDetail header |
 | Blog post title | `text-4xl md:text-6xl font-semibold tracking-tighter leading-[1.05]` | PostDetail header |
-| Blog list item | `text-4xl md:text-5xl lg:text-[5vw] font-medium tracking-tight` | Fluid sizing |
-| IndexList row title | `text-4xl sm:text-5xl lg:text-7xl font-medium tracking-tight` | |
+| Blog list item | `text-[1.75rem] sm:text-[2rem] md:text-[2.5rem] lg:text-[clamp(2.5rem,3.2vw,3.25rem)] font-medium tracking-tight` | Readable index density |
+| IndexList row title | `text-[1.75rem] sm:text-[2rem] md:text-[2.5rem] lg:text-[clamp(2.5rem,3.2vw,3.25rem)] font-medium tracking-tight` | Matches blog list scale |
 | About body | `text-2xl md:text-3xl lg:text-[2.5rem] leading-[1.3] font-medium tracking-tight` | |
 | Section heading (prose) | `text-3xl md:text-4xl font-semibold tracking-tight` | `.case-prose h2` |
 | Card title | `text-xl font-semibold` | Overview3D overlay |

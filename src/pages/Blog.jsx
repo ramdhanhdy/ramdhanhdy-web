@@ -48,7 +48,7 @@ export default function Blog() {
           variants={containerVariants}
           initial="hidden"
           animate="show"
-          className="flex flex-col gap-10 sm:gap-12 md:gap-16 max-w-[90vw] mx-auto"
+          className="flex flex-col max-w-[90vw] mx-auto"
         >
           {posts.map((post, index) => (
             <MotionListItem key={post.slug} variants={itemVariants} className="group relative">
@@ -63,14 +63,14 @@ export default function Blog() {
                 </span>
                 
                 {/* Oversized Title */}
-                <h2 className="text-[2rem] sm:text-4xl md:text-5xl lg:text-[5vw] leading-[1.08] md:leading-[1.05] font-medium tracking-tight text-white break-words transition-colors duration-500 ease-out group-hover:text-neon">
+                <h2 className="text-[1.75rem] sm:text-[2rem] md:text-[2.5rem] lg:text-[clamp(2.5rem,3.2vw,3.25rem)] leading-[1.12] font-medium tracking-tight text-white break-words transition-colors duration-500 ease-out group-hover:text-neon">
                   {post.title}
                 </h2>
               </a>
               
               {/* Subtle separator */}
               {index !== posts.length - 1 && (
-                <div className="w-full h-[1px] bg-white/10 mt-10 sm:mt-12 md:mt-16 group-hover:bg-neon/30 transition-colors duration-500" />
+                <div className="w-full h-[1px] bg-white/10 my-5 sm:my-6 md:my-8 group-hover:bg-neon/30 transition-colors duration-500" />
               )}
             </MotionListItem>
           ))}
