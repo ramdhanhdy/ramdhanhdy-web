@@ -214,14 +214,14 @@ export default function About() {
               <div className="stack-reveal grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(18rem,28rem)] md:items-end">
                 <div>
                   <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-zinc-500 sm:text-xs">
-                    Tech stack / Working toolkit
+                    Toolkit
                   </p>
                   <h2 className="mt-4 max-w-2xl text-4xl font-medium tracking-tighter text-white sm:text-5xl md:text-6xl">
-                    Tools shaped by the work.
+                    Tools I work with.
                   </h2>
                 </div>
                 <p className="max-w-md text-sm leading-relaxed text-zinc-500 sm:text-base md:justify-self-end">
-                  The tools I reach for, depending on the problem.
+                  Grouped by the kind of problem they solve.
                 </p>
               </div>
 
